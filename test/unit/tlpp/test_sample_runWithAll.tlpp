@@ -1,0 +1,25 @@
+#include "tlpp-probat.th"
+
+namespace       test.unit.tlpp
+
+using namespace tlpp.probat
+
+
+/*-------------------------------------------------------------/
+DOC Oficial:
+https://tdn.totvs.com/display/tec/e-1+-+A+Annotation+TestFixture
+
+- RUNWITHALL
+- RWA
+/-------------------------------------------------------------*/
+
+@TestFixture( owner='sample', runWithAll=.F. )
+function test_rwa_I()
+  assertError( 'este teste jamais deve ser executado em modo all [test] | property runWithAll' )
+return .T.
+
+
+@TestFixture( owner='sample', rwa=.F. )
+function test_rwa_II()
+  assertError( 'este teste jamais deve ser executado em modo all [test] | property rwa' )
+return .T.

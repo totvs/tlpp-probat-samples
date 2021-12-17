@@ -1,0 +1,28 @@
+#include "tlpp-probat.th"
+
+namespace       test.unit.prw
+
+using namespace tlpp.probat
+
+@TestFixture(owner='sample')
+function test_sample_prw()
+
+  local nResult := 0
+
+  nResult := samplePRW( 10, 10 )
+  assertEquals( nResult, 20 )
+
+  nResult := samplePRW( Nil, 10 )
+  assertEquals( nResult, 10 )
+
+  /*
+  NOTA: 
+  Deixamos propositalmente comentado para ficar claro o entendimento da
+  cobertura de codigo, pois o testes nao passara por:
+    sample_ok.prw | linha 11
+  
+  nResult := samplePRW( 5, Nil )
+  assertEquals( nResult, 5 )
+  */
+
+return .T.

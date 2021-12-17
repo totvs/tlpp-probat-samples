@@ -1,0 +1,19 @@
+#include 'tlpp-probat.th'
+
+namespace   test.config
+
+/*
+----------------------------------------------------
+---------- ALTERACAO % COVERAGE POR FONTE ----------
+----------------------------------------------------
+*/
+COVERAGE PERCENTAGE 90 NAMESPACE "sample.tlpp" SOURCE sample_ok TYPE tlpp
+
+/*
+----------------------------------------------------
+------------- ALTERACAO SUITE POR FONTE ------------
+----------------------------------------------------
+*/
+
+SUITE minha_suite     EXCLUSIVE
+SUITE minha_suite_ok  EXCLUSIVE

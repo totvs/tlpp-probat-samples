@@ -1,0 +1,10 @@
+namespace sample.tlpp
+
+function sampleError()
+
+  local cTest := '1'
+
+  if ( cTest == 1 ) // vai gerar um error log
+  endif
+
+return Nil

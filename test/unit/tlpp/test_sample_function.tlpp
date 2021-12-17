@@ -1,0 +1,18 @@
+#include "tlpp-probat.th"
+
+namespace       test.unit.tlpp
+
+/*-------------------------------------------------------------/
+DOC Oficial:
+https://tdn.totvs.com/pages/viewpage.action?pageId=654948020
+/-------------------------------------------------------------*/
+@TestFixture(owner='sample')
+function test_sample_function()
+
+  local cTest     := 'test_1'
+  local xValue    := sample.tlpp.sampleOK( cTest )
+  local xExpected := cTest
+
+  tlpp.probat.assertEquals( xValue, xExpected , 'sample.tlpp.sampleOK( cTest )' )
+
+return .T.

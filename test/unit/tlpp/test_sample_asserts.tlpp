@@ -1,0 +1,60 @@
+#include "tlpp-core.th"
+#include "tlpp-probat.th"
+
+namespace       test.unit.tlpp
+
+using namespace tlpp.probat
+
+
+#define _str_       'str_test'
+#define _num_       100
+#define _json_      '{"key":"value"}'
+#define _arr_       {1,2,3,"4",Nil,6}
+
+
+/*-------------------------------------------------------------/
+DOC Oficial:
+https://tdn.totvs.com/display/tec/d+-+Asserts
+/-------------------------------------------------------------*/
+@TestFixture(owner='sample')
+function test_sample_asserts()
+
+  local oJson1
+  local oJson2
+
+  assertEquals(    _str_ , 'str_test'     , 'Desc: valores devem ser iguais'     )
+  assertNotEquals( _str_ , 'str_test_diff', 'Desc: valores devem ser diferentes' )
+
+  assertOK(      'Desc: Gera resultado positivo' )
+  assertError(   'Desc: Gera resultado negativo' ) // Comente essa linha caso queira que não quebre os resultados
+  assertWarning( 'Desc: Gera mensagem de aviso, mas nao gera resultados nem positivo, nem negativo' )
+
+  assertTrue(  .T., "Desc: Compara se a variavel e logical e true"  )
+  assertFalse( .F., "Desc: Compara se a variavel e logical e false" )
+
+  assertGreater(        _num_, 99 , "Desc: Valor deve ser maior que o esperado"          )
+  assertGreaterOrEqual( _num_, 100, "Desc: Valor deve ser maior ou igual que o esperado" )
+
+  assertLess(        _num_, 101, "Desc: Valor deve ser menor que o esperado"          )
+  assertLessOrEqual( _num_, 100, "Desc: Valor deve ser menor ou igual que o esperado" )
+
+  assertIsRegExFull(    "So tem letras"                      , "[A-Za-z ]+", "Desc: Regex 100% exato"         )
+  assertIsRegExPartial( "123 tem letras e numeros 456 tambem", "[A-Za-z ]+", "Desc: Regex parcialmente exato" )
+
+  assertIsContained( _str_, "_", "Desc: valor do teste deve conter o valor esperado (somente string)"  )
+
+  assertNil(  , "Desc: valor deve ser Nulo" ) 
+  assertNull( , "Desc: valor deve ser Nulo" ) 
+
+  assertVector( _arr_, {1,2,3,"4",Nil,6}, "Desc: os vetores devem ser iguais" )
+
+  oJson1 := JsonObject():New()
+    oJson1:fromJson( _json_ )
+
+  oJson2 := JsonObject():New()
+    oJson2:fromJson( _json_ )
+
+  assertJson( oJson1, oJson2, "Desc: Os dois objetos json devem ser iguais"      )
+  assertJson( oJson1, _json_, "Desc: O objeto json deve ser igual a string json" )
+
+return .T.

@@ -1,0 +1,23 @@
+#include "tlpp-probat.th"
+
+namespace       test.unit.tlpp
+
+using namespace tlpp.probat
+
+
+/*-------------------------------------------------------------/
+DOC Oficial:
+https://tdn.totvs.com/display/tec/e-5+-+Suites
+/-------------------------------------------------------------*/
+
+@TestFixture( owner='sample', suite="minha_suite" )
+function test_SUITE_I()
+  assertError( 'esse teste jamais deve ser executado em modo all [test] | command SUITE' )
+return .T.
+
+
+@TestFixture( owner='sample', suite="minha_suite" )
+function test_SUITE_II()
+  assertError( 'esse teste jamais deve ser executado em modo all [suite] | command SUITE' )
+return .T.
+
