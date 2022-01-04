@@ -14,7 +14,7 @@ https://tdn.totvs.com/display/tec/e-8+-+Error+Log
 Teste de exemplo do manual da engine escrito em classe
 Exemplo do mesmo teste porem em FUNCTION (com error log)
 /-------------------------------------------------------------*/
-@TestFixture(owner='sample')
+@TestFixture(owner='sample',target="sample_error.tlpp")
 class test_class_errorLog
 
   private data xValue
@@ -41,7 +41,7 @@ return .T.
 /*-------------------------------------------------------------/
 Exemplo do mesmo teste porem em FUNCTION (com error log)
 /-------------------------------------------------------------*/
-@TestFixture(owner='sample')
+@TestFixture(owner='sample',target="sample_error.tlpp")
 @ErrorLog('type mismatch')
 function test_function_errorLog()
   sample.tlpp.sampleError()

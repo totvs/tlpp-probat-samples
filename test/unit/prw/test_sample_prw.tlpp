@@ -4,7 +4,7 @@ namespace       test.unit.prw
 
 using namespace tlpp.probat
 
-@TestFixture(owner='sample')
+@TestFixture(owner='sample',target='sample_ok.prw')
 function test_sample_prw()
 
   local nResult := 0

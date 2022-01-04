@@ -11,7 +11,7 @@ using namespace tlpp.probat
 DOC Oficial:
 https://tdn.totvs.com/display/tec/b+-+Teste+simples+com+classe
 /-------------------------------------------------------------*/
-@TestFixture(owner='sample')
+@TestFixture(owner='sample',target="sample_ok.tlpp")
 class test_sample_class
 
   private data cTeste     as character

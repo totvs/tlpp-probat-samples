@@ -1,0 +1,10 @@
+
+function ListFunctionCross()
+
+  local aRet := {}
+
+  aadd( aRet, 'sample_ok.prw'     )
+  aadd( aRet, 'sample_ok.tlpp'    )
+  aadd( aRet, 'sample_error.tlpp' )
+
+return aRet

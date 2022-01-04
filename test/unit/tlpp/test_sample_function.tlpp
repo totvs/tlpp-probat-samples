@@ -6,7 +6,7 @@ namespace       test.unit.tlpp
 DOC Oficial:
 https://tdn.totvs.com/pages/viewpage.action?pageId=654948020
 /-------------------------------------------------------------*/
-@TestFixture(owner='sample')
+@TestFixture(owner='sample',target="sample_ok.tlpp")
 function test_sample_function()
 
   local cTest     := 'test_1'
