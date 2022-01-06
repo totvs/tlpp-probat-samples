@@ -1,7 +1,7 @@
 #include "tlpp-core-dev.th"
 #include "tlpp-probat.th"
 
-namespace       test.unit.tlpp
+namespace       test.tlpp
 
 using namespace tlpp.probat
 using namespace sample.tlpp

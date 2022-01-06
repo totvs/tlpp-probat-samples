@@ -1,6 +1,6 @@
 #include "tlpp-probat.th"
 
-namespace       test.unit.prw
+namespace       test.prw
 
 using namespace tlpp.probat
 

@@ -1,6 +1,6 @@
 #include "tlpp-probat.th"
 
-namespace       test.unit.tlpp
+namespace       test.tlpp
 
 /*-------------------------------------------------------------/
 DOC Oficial:
