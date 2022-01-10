@@ -10,28 +10,40 @@ main function testRun()
   conout( '      iniciando os testes     ' )
   conout( '------------------------------' )
 
-  // Verificando se PROBAT está instalado em seu ambiente
+  conout( "#############################################" )
+  conout( "Verificando se PROBAT está instalado em seu ambiente" )
   lInstall := tlpp.module( 'PROBAT', @jModule )
   
   if ( lInstall )
 
-		conout( 'Modulo....: ' + jModule['module'] )
-		conout( 'Instalado?: ' + if( jModule['linked'], 'sim', 'não' ) )
+		conout( "#############################################" )
+    conout( 'Modulo....: ' + jModule['module'] )
+		conout( 'Instalado?: ' + if( jModule['linked'], 'sim', 'nï¿½o' ) )
 		conout( 'Versão....: ' + jModule['version'] )
 
-    // Executa os testes da suite que nao roda em modo ALL
+    conout( "#############################################" )
+    conout( "Iniciando a descoberta dos fontes de testes" )
+    tlpp.probat.discovery()
+
+    sleep( 1000 )
+
+    conout( "#############################################" )
+    conout( "Executa os testes da suite que não roda em modo ALL" )
     tlpp.probat.runOffCoverage( "type:suite", "minha_suite_ok", "custom:"+cKey )
 
     sleep( 2000 )
-    
-    // Executa todos os testes em modo ALL
+
+    conout( "#############################################" )
+    conout( "Executa todos os testes em modo ALL" )
     tlpp.probat.run( "custom:"+cKey )
 
-    // Exporta os resultados de todas as execuções acima
+    conout( "#############################################" )
+    conout( "Exporta os resultados de todas as execuções acima" )
     tlpp.probat.export( "type:custom", cKey )
 
   else
-		conout( ' ## PROBAT nao instalado !' )
+		conout( "#############################################" )
+    conout( ' ## PROBAT não instalado !' )
 	endif
 
   conout( '------------------------------' )
