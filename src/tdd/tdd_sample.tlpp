@@ -1,0 +1,12 @@
+
+namespace src.tdd
+
+function sumNum( nP1 as numeric, nP2 as numeric ) as numeric
+
+  local nSum  := 0 as numeric
+
+  if ( valtype(nP1)=='N' .and. valtype(nP2)=='N' )
+    nSum := (nP1 + nP2)
+  endif
+
+return nSum

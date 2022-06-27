@@ -1,0 +1,27 @@
+
+namespace   src.coverage
+
+function srcCoverage( nType as numeric ) as character
+
+  local cChar := '' as character
+
+  if ( valtype(nType) <> 'N' )
+    nType := 0
+  endif
+
+  do case
+    case ( nType == 1 )
+      cChar := 'Aa'
+    case ( nType == 2 )
+      cChar := 'Ee'
+    case ( nType == 3 )
+      cChar := 'Ii'
+    case ( nType == 4 )
+      cChar := 'Oo'
+    case ( nType == 5 )
+      cChar := 'Uu'
+    otherwise
+      cChar := '--'
+  endcase
+
+return cChar

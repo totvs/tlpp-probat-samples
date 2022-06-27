@@ -1,4 +1,4 @@
-namespace sample.tlpp
+namespace src.tlpp
 
 function sampleError()
 

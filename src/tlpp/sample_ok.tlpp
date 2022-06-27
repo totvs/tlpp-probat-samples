@@ -1,5 +1,5 @@
 
-namespace sample.tlpp
+namespace src.tlpp
 
 function sampleOK( cTest )
 return cTest

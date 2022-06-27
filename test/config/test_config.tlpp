@@ -17,3 +17,4 @@ COVERAGE PERCENTAGE 90 NAMESPACE "sample.tlpp" SOURCE sample_ok TYPE tlpp
 
 SUITE minha_suite     EXCLUSIVE
 SUITE minha_suite_ok  EXCLUSIVE
+SUITE bd              EXCLUSIVE

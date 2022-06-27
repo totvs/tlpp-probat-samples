@@ -5,7 +5,6 @@ main function testRun()
   local lInstall  := .F.
   local jModule
 
-
   conout( '------------------------------' )
   conout( '      iniciando os testes     ' )
   conout( '------------------------------' )
