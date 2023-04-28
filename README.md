@@ -8,10 +8,6 @@ Esse projeto no GitHub contempla somente exemplos de uso das funcionalidades do 
 Para melhor entendimento desse projeto, recomendamos fortemente a leitura de sua documentação técnica em:
 [tdn.totvs.com/display/tec/PROBAT](https://tdn.totvs.com/display/tec/PROBAT)
 
-Para obter a ferramenta oficial, baixe os pacotes em:
-[Downloads](https://tdn.totvs.com/display/tec/Downloads)
-Sessão: [ *§ PROBAT (Test Engine)* ]
-
 #### INI
 
 Abaixo segue a configuração do appserver.ini para utilizar essa ferramenta e executar esse projeto.
