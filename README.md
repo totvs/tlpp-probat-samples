@@ -29,7 +29,7 @@ Melhorar a qualidade do código-fonte em seu projeto de software, possibilitando
 
 > #### Importante!
 > 
-> 1 - Para melhor entendimento desse projeto, recomendamos fortemente a leitura de sua documentação técnica em: [tdn.totvs.com/display/tec/PROBAT](https://tdn.totvs.com/display/tec/PROBAT)
+> 1 - Para melhor entendimento desse projeto, recomendamos fortemente a leitura de sua documentação técnica em: [tdn.totvs.com/display/tec/PROBAT](https://tdn.totvs.com/display/tec/PROBAT)<br>
 > 2 - Recomendamos também assistir ao vídeo [Iniciando no PROBAT](https://www.youtube.com/watch?v=covZWUvXwRA) em nosso canal do Youtube.
 
 ### Estrutura do Projeto
