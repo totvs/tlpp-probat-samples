@@ -27,8 +27,39 @@ Melhorar a qualidade do código-fonte em seu projeto de software, possibilitando
 * Aprimorar a área de **QA** (Quality Assurance) em seu projeto.
 
 
-#### Importante
+> #### Importante!
+> 
+> 1 - Para melhor entendimento desse projeto, recomendamos fortemente a leitura de sua documentação técnica em: [tdn.totvs.com/display/tec/PROBAT](https://tdn.totvs.com/display/tec/PROBAT)
+> 2 - Recomendamos também assistir ao vídeo [Iniciando no PROBAT](https://www.youtube.com/watch?v=covZWUvXwRA) em nosso canal do Youtube.
 
-1 - Para melhor entendimento desse projeto, recomendamos fortemente a leitura de sua documentação técnica em: [tdn.totvs.com/display/tec/PROBAT](https://tdn.totvs.com/display/tec/PROBAT)
+### Estrutura do Projeto
 
-2 - Recomendamos também assistir ao vídeo [Iniciando no PROBAT](https://www.youtube.com/watch?v=covZWUvXwRA) em nosso canal do Youtube.
+O projeto possui a seguinte estrutura de diretórios:
+
+.
+..
+├── ini
+├── run
+├── src
+└── test
+
+#### [ /ini ]
+
+Na pasta INI temos dois arquivos .ini com configurações do AppServer, um para a subida normal do server e outro para ser utilizado pelo script.
+
+Dentro deles há a configuração do **PROBAT** utilizada.
+#### [ /run ]
+
+Na pasta RUN temos todos os scripts necessários para executar o **PROBAT** de forma automatizada.
+
+Os detalhes de como utilizá-los estão em: [Como usar os scripts](scripts.MD)
+
+Além disso, existe o fonte [*main.prw*] mostrando uma outra forma de encadear as execuções, na qual a descoberta dos fontes de testes são apartadas da execução, fazemos uma execução da suite exclusiva e depois a execução de todos os testes. Ao final solicitamos a exportação dos resultados gerados.
+
+#### [ /src ]
+
+Na pasta SRC temos os fontes com a implementação de funcionalidades que serão testadas, fazendo um paralelo à sua realidade, é nessa pasta que estarão os fontes oficiais do seu projeto.
+
+#### [ /test ]
+
+Na pasta TEST temos todas as implementações dos testes com sintaxe para uso do **PROBAT**.

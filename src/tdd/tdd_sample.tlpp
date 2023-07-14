@@ -1,7 +1,7 @@
 
 namespace src.tdd
 
-function sumNum( nP1 as numeric, nP2 as numeric ) as numeric
+function U_sumNum( nP1 as numeric, nP2 as numeric ) as numeric
 
   local nSum  := 0 as numeric
 

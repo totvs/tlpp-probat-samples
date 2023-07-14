@@ -10,10 +10,10 @@ https://tdn.totvs.com/display/tec/e-3+-+Ordem+e+Prioridade
 
 // Tem que ser o primeiro a ser executado
 @TestFixture(owner='sample',priority=1)
-function test_sample_priority_1()
+function U_test_sample_priority_1()
 
   local cTest     := 'priority=1'
-  local xValue    := sample.tlpp.sampleOK( cTest )
+  local xValue    := src.tlpp.U_sampleOK( cTest )
   local xExpected := cTest
 
   tlpp.probat.assertEquals( xValue, xExpected )
@@ -23,10 +23,10 @@ return .T.
 
 // Tem que ser o ultimo a ser executado
 @TestFixture(owner='sample',priority=999)
-function test_sample_priority_999()
+function U_test_sample_priority_999()
 
   local cTest     := 'priority=999'
-  local xValue    := sample.tlpp.sampleOK( cTest )
+  local xValue    := src.tlpp.U_sampleOK( cTest )
   local xExpected := cTest
 
   tlpp.probat.assertEquals( xValue, xExpected )
@@ -36,10 +36,10 @@ return .T.
 
 // Tem que ser o penultimo a ser executado
 @TestFixture(owner='sample',thread="no")
-function test_sample_no_thread()
+function U_test_sample_no_thread()
 
   local cTest     := 'no_thread'
-  local xValue    := sample.tlpp.sampleOK( cTest )
+  local xValue    := src.tlpp.U_sampleOK( cTest )
   local xExpected := cTest
 
   tlpp.probat.assertEquals( xValue, xExpected )

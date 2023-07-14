@@ -4,6 +4,6 @@
 namespace src.api
 
 @Get("/test/sample")
-function testRestGeneral()
+function U_testRestGeneral()
   oRest:setResponse( '{"response":"ok"}' )
 return

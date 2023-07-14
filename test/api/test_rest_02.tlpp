@@ -6,7 +6,7 @@ namespace   test.api
 using namespace tlpp.probat
 
 @TestFixture()
-function testRest02_A()
+function U_testRest02_A()
 
   local aUrls         := urlsRestExecTest()
   local cEndPoint     := '/test/sample'

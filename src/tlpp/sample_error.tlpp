@@ -1,6 +1,6 @@
 namespace src.tlpp
 
-function sampleError()
+function U_sampleError()
 
   local cTest := '1'
 

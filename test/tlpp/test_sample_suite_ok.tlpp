@@ -8,6 +8,6 @@ https://tdn.totvs.com/display/tec/e-5+-+Suites
 /-------------------------------------------------------------*/
 
 @TestFixture( owner='sample', suite="minha_suite_ok" )
-function test_SUITE_OK()
+function U_test_SUITE_OK()
   tlpp.probat.assertOK( 'Esse teste sera executado somente com modo suite exclusiva' )
 return .T.

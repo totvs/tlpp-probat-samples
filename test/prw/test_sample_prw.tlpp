@@ -5,14 +5,14 @@ namespace       test.prw
 using namespace tlpp.probat
 
 @TestFixture(owner='sample',target='sample_ok.prw')
-function test_sample_prw()
+function U_test_sample_prw()
 
   local nResult := 0
 
-  nResult := samplePRW( 10, 10 )
+  nResult := U_samplePRW( 10, 10 )
   assertEquals( nResult, 20 )
 
-  nResult := samplePRW( Nil, 10 )
+  nResult := U_samplePRW( Nil, 10 )
   assertEquals( nResult, 10 )
 
   /*
@@ -21,7 +21,7 @@ function test_sample_prw()
   cobertura de codigo, pois o testes nao passara por:
     sample_ok.prw | linha 11
   
-  nResult := samplePRW( 5, Nil )
+  nResult := U_samplePRW( 5, Nil )
   assertEquals( nResult, 5 )
   */
 

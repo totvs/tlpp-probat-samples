@@ -4,38 +4,38 @@
 namespace  test.coverage
 
 using namespace tlpp.probat
-  
+
 @TestFixture()
-function testCoverage()
-  
+function U_testCoverage()
+
   local xValue
   local xExpected
 
-  xValue    := src.coverage.srcCoverage( 1 )
+  xValue    := src.coverage.U_srcCoverage( 1 )
   xExpected := 'Aa'
     assertEquals( xValue, xExpected )
 
-  xValue    := src.coverage.srcCoverage( 2 )
+  xValue    := src.coverage.U_srcCoverage( 2 )
   xExpected := 'Ee'
     assertEquals( xValue, xExpected )
 
-  xValue    := src.coverage.srcCoverage( 3 )
+  xValue    := src.coverage.U_srcCoverage( 3 )
   xExpected := 'Ii'
     assertEquals( xValue, xExpected )
 
-  xValue    := src.coverage.srcCoverage( 4 )
+  xValue    := src.coverage.U_srcCoverage( 4 )
   xExpected := 'Oo'
     assertEquals( xValue, xExpected )
 
-  xValue    := src.coverage.srcCoverage( 5 )
+  xValue    := src.coverage.U_srcCoverage( 5 )
   xExpected := 'Uu'
     assertEquals( xValue, xExpected )
 
-  xValue    := src.coverage.srcCoverage( 0 )
+  xValue    := src.coverage.U_srcCoverage( 0 )
   xExpected := '--'
     assertEquals( xValue, xExpected )
 
-  xValue    := src.coverage.srcCoverage()
+  xValue    := src.coverage.U_srcCoverage()
   xExpected := '--'
     assertEquals( xValue, xExpected )
 

@@ -17,7 +17,7 @@ DOC Oficial:
 https://tdn.totvs.com/display/tec/d+-+Asserts
 /-------------------------------------------------------------*/
 @TestFixture(owner='sample')
-function test_sample_asserts()
+function U_test_sample_asserts()
 
   local oJson1
   local oJson2
@@ -26,7 +26,7 @@ function test_sample_asserts()
   assertNotEquals( _str_ , 'str_test_diff', 'Desc: valores devem ser diferentes' )
 
   assertOK(      'Desc: Gera resultado positivo' )
-  assertError(   'Desc: Gera resultado negativo' ) // Comente essa linha caso queira que não quebre os resultados
+  //assertError(   'Desc: Gera resultado negativo' ) // Comente essa linha caso queira que não quebre os resultados
   assertWarning( 'Desc: Gera mensagem de aviso, mas nao gera resultados nem positivo, nem negativo' )
 
   assertTrue(  .T., "Desc: Compara se a variavel e logical e true"  )
@@ -44,7 +44,6 @@ function test_sample_asserts()
   assertIsContained( _str_, "_", "Desc: valor do teste deve conter o valor esperado (somente string)"  )
 
   assertNil(  , "Desc: valor deve ser Nulo" ) 
-  assertNull( , "Desc: valor deve ser Nulo" ) 
 
   assertVector( _arr_, {1,2,3,"4",Nil,6}, "Desc: os vetores devem ser iguais" )
 

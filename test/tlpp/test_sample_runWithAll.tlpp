@@ -14,12 +14,12 @@ https://tdn.totvs.com/display/tec/e-1+-+A+Annotation+TestFixture
 /-------------------------------------------------------------*/
 
 @TestFixture( owner='sample', runWithAll=.F. )
-function test_rwa_I()
+function U_test_rwa_I()
   assertError( 'este teste jamais deve ser executado em modo all [test] | property runWithAll' )
 return .T.
 
 
 @TestFixture( owner='sample', rwa=.F. )
-function test_rwa_II()
+function U_test_rwa_II()
   assertError( 'este teste jamais deve ser executado em modo all [test] | property rwa' )
 return .T.

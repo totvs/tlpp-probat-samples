@@ -1,5 +1,5 @@
 
-function samplePRW( nVar1, nVar2 )
+function U_samplePRW( nVar1, nVar2 )
 
   local nSoma := 0
 

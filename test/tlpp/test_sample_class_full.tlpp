@@ -86,7 +86,7 @@ method DownAll() class test_sample_class_full
 return .T.
 
 method DownOne() class test_sample_class_full
-  ::nInt_1 := Nil
-  ::nInt_2 := Nil
+  ::nInt_1 := 0
+  ::nInt_2 := 0
   conout( '  -> [OneTimeTearDown] Method: ' + procname() )
 return .T.

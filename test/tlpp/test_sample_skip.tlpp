@@ -1,4 +1,4 @@
-#include "tlpp-core-dev.th"
+#include "tlpp-core.th"
 #include "tlpp-probat.th"
 
 namespace       test.tlpp
@@ -44,7 +44,7 @@ return self
 
 method ExampleForUse() class test_class_skip
   local cTest := 'test_class'
-  ::xValue    := sample.tlpp.sampleOK( cTest )
+  ::xValue    := src.tlpp.U_sampleOK( cTest )
   ::xExpected := cTest
     assertEquals( ::xValue, ::xExpected )
 return .T.
@@ -67,7 +67,7 @@ Exemplo do mesmo teste so que em FUNCTION (com SKIP)
 /--------------------------------------------------------------*/
 @TestFixture(owner='sample')
 @Skip()
-function test_function_Skip()
+function U_test_function_Skip()
   assertError( 'nao deve registrar esse assert' )
 return .T.
 
@@ -76,7 +76,7 @@ return .T.
 Exemplo do mesmo teste so que em FUNCTION (com SKIP ASSERT)
 /--------------------------------------------------------------*/
 @TestFixture(owner='sample')
-function test_function_Skip_Assert()
+function U_test_function_Skip_Assert()
 
   SKIPASSERT
   assertError( 'nao deve registrar esse assert' )
@@ -92,30 +92,30 @@ Exemplos de Skip com Filtro
 
 @TestFixture(owner='sample')
 @Skip(tlppVersion=">= 01.02.10")
-function test_function_Skip_1()
+function U_test_function_Skip_1()
   assertError( 'nao deve registrar esse assert' )
 return .T.
 
 @TestFixture(owner='sample')
 @Skip(system="windows")
-function test_function_Skip_2()
+function U_test_function_Skip_2()
   assertError( 'nao deve registrar esse assert' )
 return .T.
 
 @TestFixture(owner='sample')
-@Skip(appServerName="LOBO-GUARA")
-function test_function_Skip_3()
+@Skip(appServerName="HARPIA")
+function U_test_function_Skip_3()
   assertError( 'nao deve registrar esse assert' )
 return .T.
 
 @TestFixture(owner='sample')
-@Skip(system="windows",appServerName="LOBO-GUARA",tlppVersion=">= 01.02.10")
-function test_function_Skip_4()
+@Skip(system="windows",appServerName="HARPIA",tlppVersion=">= 01.02.10")
+function U_test_function_Skip_4()
   assertError( 'nao deve registrar esse assert' )
 return .T.
 
 @TestFixture(owner='sample')
-function test_function_Skip_5()
+function U_test_function_Skip_5()
 
   SKIPASSERT TLPPVERSION ">= 01.02.10"
   assertError( 'nao deve registrar esse assert' )
@@ -123,9 +123,9 @@ function test_function_Skip_5()
   SKIPASSERT SYSTEM "windows"
   assertError( 'nao deve registrar esse assert' )
 
-  SKIPASSERT APPSERVERNAME "LOBO-GUARA"
+  SKIPASSERT APPSERVERNAME "HARPIA"
   assertError( 'nao deve registrar esse assert' )
 
-  SKIPASSERT SYSTEM "windows" APPSERVERNAME "LOBO-GUARA" TLPPVERSION ">= 01.02.10"
+  SKIPASSERT SYSTEM "windows" APPSERVERNAME "HARPIA" TLPPVERSION ">= 01.02.10"
   assertError( 'nao deve registrar esse assert' )
 return .T.

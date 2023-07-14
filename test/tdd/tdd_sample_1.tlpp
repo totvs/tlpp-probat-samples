@@ -4,19 +4,19 @@
 namespace  test.tdd
 
 using namespace tlpp.probat
-  
+
 @TestFixture()
 //@skip()
-function test_tdd_sample_1()
-  
+function U_test_tdd_sample_1()
+
   local xValue
   local xExpected
 
-  xValue    := src.tdd.sumNum( 1,2 )
+  xValue    := src.tdd.U_sumNum( 1,2 )
   xExpected := 3
     assertEquals( xValue, xExpected )
 
-  xValue    := src.tdd.sumNum( 10,20 )
+  xValue    := src.tdd.U_sumNum( 10,20 )
   xExpected := 30
     assertEquals( xValue, xExpected )
 

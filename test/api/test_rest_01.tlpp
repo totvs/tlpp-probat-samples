@@ -6,7 +6,7 @@ namespace   test.api
 using namespace tlpp.probat
 
 @TestFixture()
-function testRest01()
+function U_testRest01()
 
   local cEndPoint     := '/test/sample'
   local cMethod       := 'GET'

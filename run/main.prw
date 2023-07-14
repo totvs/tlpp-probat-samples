@@ -1,5 +1,5 @@
 
-main function testRun()
+function U_testRun()
 
   local cKey      := "Hgk34Gnm90-" + strTran( time(), ":", "-" )
   local lInstall  := .F.

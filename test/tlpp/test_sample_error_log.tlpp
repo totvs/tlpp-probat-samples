@@ -1,4 +1,4 @@
-#include "tlpp-core-dev.th"
+#include "tlpp-core.th"
 #include "tlpp-probat.th"
 
 namespace       test.tlpp
@@ -34,7 +34,7 @@ method new() class test_class_errorLog
 return self
 
 method ExampleForUseErrorLog() class test_class_errorLog
-	sample.tlpp.sampleError()
+	src.tlpp.U_SAMPLEERROR()
 return .T.
 
 
@@ -43,7 +43,7 @@ Exemplo do mesmo teste porem em FUNCTION (com error log)
 /-------------------------------------------------------------*/
 @TestFixture(owner='sample',target="sample_error.tlpp")
 @ErrorLog('type mismatch')
-function test_function_errorLog()
-  sample.tlpp.sampleError()
+function U_test_function_errorLog()
+  src.tlpp.U_SAMPLEERROR()
 return .T.
 

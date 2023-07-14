@@ -29,7 +29,7 @@ return self
 
 method test_sampleOK() class test_sample_class
 
-  local cValue := sample.tlpp.sampleOK( _str_ )
+  local cValue := src.tlpp.U_sampleOK( _str_ )
 
               // Result, Expected
   assertEquals( cValue , ::cTeste )
