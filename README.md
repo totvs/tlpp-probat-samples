@@ -34,13 +34,13 @@ Melhorar a qualidade do código-fonte em seu projeto de software, possibilitando
 
 ### Estrutura do Projeto
 
-O projeto possui a seguinte estrutura de diretórios:
+O projeto possui a seguinte estrutura de diretórios:<br>
 .<br>
-..
-├── ini
-├── run
-├── src
-└── test
+..<br>
+├── ini<br>
+├── run<br>
+├── src<br>
+└── test<br>
 
 #### [ /ini ]
 
