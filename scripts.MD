@@ -1,11 +1,12 @@
 # Como usar os Scripts
 
-Na pasta RUN, temos os seguintes arquivos relativos aos scripts:
-.
-└── run
-    ├── install.sh
-    ├── preRun.sh
-    └── run.sh
+Na pasta RUN, temos os seguintes arquivos relativos aos scripts:<br>
+.<br>
+..<br>
+└── run<br>
+    ├── install.sh<br>
+    ├── preRun.sh<br>
+    └── run.sh<br>
 
 Para seguir com o uso, seguiremos os seguintes passos:
 
