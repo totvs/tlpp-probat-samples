@@ -1,5 +1,5 @@
 
-namespace src.tlpp
+namespace tlpp
 
 function U_sampleOK( cTest )
 return cTest

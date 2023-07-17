@@ -11,32 +11,38 @@ function U_testCoverage()
   local xValue
   local xExpected
 
-  xValue    := src.coverage.U_srcCoverage( 1 )
+  xValue    := coverage.U_srcCoverage( 1 )
   xExpected := 'Aa'
     assertEquals( xValue, xExpected )
 
-  xValue    := src.coverage.U_srcCoverage( 2 )
+  xValue    := coverage.U_srcCoverage( 2 )
   xExpected := 'Ee'
     assertEquals( xValue, xExpected )
 
-  xValue    := src.coverage.U_srcCoverage( 3 )
+  xValue    := coverage.U_srcCoverage( 3 )
   xExpected := 'Ii'
     assertEquals( xValue, xExpected )
 
-  xValue    := src.coverage.U_srcCoverage( 4 )
+  xValue    := coverage.U_srcCoverage( 4 )
   xExpected := 'Oo'
     assertEquals( xValue, xExpected )
 
-  xValue    := src.coverage.U_srcCoverage( 5 )
+  xValue    := coverage.U_srcCoverage( 5 )
   xExpected := 'Uu'
     assertEquals( xValue, xExpected )
 
-  xValue    := src.coverage.U_srcCoverage( 0 )
-  xExpected := '--'
-    assertEquals( xValue, xExpected )
+  // Comentado propositadamente para causar % menor de cobertura
 
-  xValue    := src.coverage.U_srcCoverage()
-  xExpected := '--'
-    assertEquals( xValue, xExpected )
+  // xValue    := coverage.U_srcCoverage( 0 )
+  // xExpected := ''
+  //   assertEquals( xValue, xExpected )
+
+  // xValue    := coverage.U_srcCoverage( 6 )
+  // xExpected := ''
+  //   assertEquals( xValue, xExpected )
+
+  // xValue    := coverage.U_srcCoverage()
+  // xExpected := '--'
+  //   assertEquals( xValue, xExpected )
 
 return .T.

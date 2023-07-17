@@ -1,0 +1,37 @@
+#include "tlpp-core.th"
+#include "tlpp-probat.th"
+
+namespace       test.tlpp
+
+using namespace tlpp.probat
+
+#define _str_ "teste_class"
+
+/*-------------------------------------------------------------/
+DOC Oficial:
+https://tdn.totvs.com/display/tec/b+-+Teste+simples+com+classe
+/-------------------------------------------------------------*/
+@TestFixture(owner='sample',target="sample_ok.tlpp")
+class test_sample_class
+
+  private data cTeste     as character
+
+  public method new()     constructor
+
+  @Test('aqui deve-se colocar o descritivo sobre o teste') 
+  public method test_sampleOK() 
+
+endclass
+
+method new() class test_sample_class
+  ::cTeste := _str_
+return self
+
+method test_sampleOK() class test_sample_class
+
+  local cValue := tlpp.U_sampleOK( _str_ )
+
+              // Result, Expected
+  assertEquals( cValue , ::cTeste )
+
+return .T.

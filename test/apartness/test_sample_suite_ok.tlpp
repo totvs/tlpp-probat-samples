@@ -1,0 +1,10 @@
+#include "tlpp-probat.th"
+
+namespace       test.tlpp
+
+@TestFixture( suite="minha_suite_ok" )
+function U_test_SUITE_OK()
+  tlpp.probat.assertOK( 'Esse teste sera executado somente com modo suite exclusiva' )
+  // Esse teste é executado pelo encadeamento em:
+  // \tlpp-probat-samples\test\apartness\test_sample_suite_ok.tlpp : [U_testRun()]
+return .T.

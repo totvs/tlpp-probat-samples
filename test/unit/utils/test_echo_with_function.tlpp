@@ -1,0 +1,28 @@
+#include "tlpp-probat.th"
+
+namespace   test.tlpp
+
+@TestFixture()
+function U_testEcho() as logical // similar a USER FUNCTION
+
+  local cTest     := 'tlpp-probat-samples' as character
+  local cValue    := utils.U_echo( cTest ) as character
+  local cExpected := cTest                 as character
+
+  tlpp.probat.assertEquals( cValue, cExpected )
+
+return .T.
+
+
+
+
+
+
+
+
+
+
+
+
+
+

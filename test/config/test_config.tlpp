@@ -1,4 +1,4 @@
-#include 'tlpp-probat.th'
+#include "tlpp-probat.th"
 
 namespace   test.config
 
@@ -7,7 +7,7 @@ namespace   test.config
 ---------- ALTERACAO % COVERAGE POR FONTE ----------
 ----------------------------------------------------
 */
-COVERAGE PERCENTAGE 90 NAMESPACE "sample.tlpp" SOURCE sample_ok TYPE tlpp
+COVERAGE PERCENTAGE 85 NAMESPACE "coverage" SOURCE sample_coverage TYPE tlpp
 
 /*
 ----------------------------------------------------

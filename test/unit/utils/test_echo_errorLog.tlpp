@@ -1,0 +1,16 @@
+#include "tlpp-probat.th"
+
+namespace   test.tlpp
+
+@TestFixture()
+@ErrorLog('type mismatch on +=')
+function U_testEchoErrorLog() as logical
+
+  local cTest     := 'tlpp-probat-samples' as character
+  local cValue    := utils.U_echo( cTest ) // ATENÇÃO: Sem tipagem, senão problema já ocorre na compilação
+
+  cValue += 1
+
+  tlpp.probat.assertError( 'esse Assert não pode executar.' )
+
+return .T.

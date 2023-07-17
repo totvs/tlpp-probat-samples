@@ -1,0 +1,49 @@
+#include "tlpp-core.th"
+#include "tlpp-probat.th"
+
+namespace       test.tlpp
+
+
+/*-------------------------------------------------------------/
+DOC Oficial:
+https://tdn.totvs.com/display/tec/e-8+-+Error+Log
+/-------------------------------------------------------------*/
+
+
+/*-------------------------------------------------------------/
+Teste de exemplo do manual da engine escrito em classe
+Exemplo do mesmo teste porem em FUNCTION (com error log)
+/-------------------------------------------------------------*/
+@TestFixture(owner='sample',target="sample_error.tlpp")
+class test_class_errorLog
+
+  private data xValue
+  private data xExpected
+
+  public method new()     constructor
+
+  @Test('exemplo de teste com error log')
+  @ErrorLog('type mismatch')
+  public method ExampleForUseErrorLog()
+
+endclass
+
+method new() class test_class_errorLog
+  ::xValue      := Nil
+  ::xExpected   := Nil
+return self
+
+method ExampleForUseErrorLog() class test_class_errorLog
+	tlpp.U_SAMPLEERROR()
+return .T.
+
+
+/*-------------------------------------------------------------/
+Exemplo do mesmo teste porem em FUNCTION (com error log)
+/-------------------------------------------------------------*/
+@TestFixture(owner='sample',target="sample_error.tlpp")
+@ErrorLog('type mismatch')
+function U_test_function_errorLog()
+  tlpp.U_SAMPLEERROR()
+return .T.
+

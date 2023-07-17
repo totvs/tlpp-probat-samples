@@ -1,4 +1,4 @@
-namespace src.tlpp
+namespace tlpp
 
 function U_sampleError()
 

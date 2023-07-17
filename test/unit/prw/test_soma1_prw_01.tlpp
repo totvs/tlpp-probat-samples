@@ -1,0 +1,6 @@
+#include "tlpp-probat.th"
+
+@TestFixture()
+function U_testSoma1_prw_01()
+  tlpp.probat.assertEquals( U_sum1(6), 7 )
+return .T.

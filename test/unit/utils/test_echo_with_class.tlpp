@@ -1,0 +1,31 @@
+#include "tlpp-core.th"
+#include "tlpp-probat.th"
+
+namespace   test.tlpp
+
+@TestFixture()
+class testEchoWithClass
+
+  private data cTest      as character
+  private data cValue     as character
+  private data cExpected  as character
+
+  public method new()     constructor
+
+  @Test('metodo de teste')
+  public method methodTest() as logical
+
+endclass
+
+method new() class testEchoWithClass
+  ::cTest := 'tlpp-probat-samples'
+return self
+
+method methodTest() class testEchoWithClass
+
+  ::cValue    := utils.U_echo( ::cTest )
+  ::cExpected := ::cTest
+
+  tlpp.probat.assertEquals( ::cValue, ::cExpected )
+
+return .T.

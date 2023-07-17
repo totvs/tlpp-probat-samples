@@ -1,0 +1,16 @@
+#include "tlpp-probat.th"
+
+namespace       test.tlpp
+
+using namespace tlpp.probat
+
+@TestFixture( runWithAll=.F. )
+function U_test_rwa_I()
+  assertError( 'este teste jamais deve ser executado em modo all [test] | property runWithAll' )
+return .T.
+
+
+@TestFixture( rwa=.F. )
+function U_test_rwa_II()
+  assertError( 'este teste jamais deve ser executado em modo all [test] | property rwa' )
+return .T.

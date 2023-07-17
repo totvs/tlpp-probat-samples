@@ -1,0 +1,49 @@
+#include "tlpp-core.th"
+#include "tlpp-probat.th"
+
+namespace   test.api
+
+using namespace tlpp.probat
+
+@TestFixture()
+function U_testRestSimple()
+
+  local cEndPoint     := '/test/sample'
+  local cMethod       := 'GET'
+  local cBodyOut      := ''
+  local cHeadRet      := ''
+  local cBodyRet      := ''
+  local nStatusCode   := 0
+  local nServiceRet   := -1
+  local xValue
+  local xExpected
+
+  // Executa Endpoint solicitado
+  nServiceRet := tlpp.rest.runTestSimple(               ;
+                                          @cHeadRet     ,; // HTTP header returned by the service
+                                          @cBodyRet     ,; // Retorno do servico
+                                          @nStatusCode  ,; // HTTP Status Code of the service
+                                          cEndPoint     ,;
+                                          cMethod       ,;
+                                          cBodyOut      ;
+                                        )
+
+  if ( nServiceRet >= 0 )
+
+    xValue    := cHeadRet
+    xExpected := "HTTP.([\w:\/.]+)([200 OK]+)"
+    assertIsRegexPartial( xValue, xExpected )
+
+    xValue    := cBodyRet
+    xExpected := '{"response":"ok"}'
+    assertJson( xValue, xExpected )
+    
+    xValue    := nStatusCode
+    xExpected := 200
+    assertEquals( xValue, xExpected )
+
+  else
+    assertError( "could not run the REST service" )
+  endif
+
+return .T.

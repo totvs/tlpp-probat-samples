@@ -1,0 +1,9 @@
+#include "tlpp-probat.th"
+
+namespace   test.tlpp
+
+@TestFixture()
+@Skip()
+function U_testEchoSkip() as logical
+  tlpp.probat.assertError( 'esse teste jamais deve ser executado.' )
+return .T.

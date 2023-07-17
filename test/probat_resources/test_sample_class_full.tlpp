@@ -1,0 +1,92 @@
+# include "tlpp-core.th"
+# include "tlpp-probat.th"
+
+namespace       test.tlpp
+
+using namespace tlpp.probat
+
+/*-------------------------------------------------------------/
+DOC Oficial:
+https://tdn.totvs.com/display/tec/c+-+Teste+completo+com+classe
+/-------------------------------------------------------------*/
+@TestFixture(owner='sample')
+class test_sample_class_full
+
+  private data nInt_1     as integer
+  private data nInt_2     as integer
+  private data nInt_max   as integer
+
+  public method new()     constructor
+
+  // Setups
+    @OneTimeSetUp()
+    public method SetOne_1()
+
+    @OneTimeSetUp()
+    public method SetOne_2()
+
+    @Setup()
+    public method SetAll()
+
+  // Tests
+    @Test('primeiro metodo de teste que deve ser executado')
+    public method FirstExampleMethod()
+
+    @Test('segundo metodo de teste que deve ser executado')
+    public method SecondExampleMethod()
+
+  //TearDown's
+    @TearDown()
+    public method DownAll()
+
+    @OneTimeTearDown()
+    public method DownOne()
+
+endclass
+
+method new() class test_sample_class_full
+  ::nInt_1 := 10
+  ::nInt_2 := 20
+  conout( '-> [constructor] Method: ' + procname() )
+return self
+
+method SetOne_1() class test_sample_class_full
+  ::nInt_1 += 5
+  ::nInt_2 += 1
+  conout( '  -> [OneTimeSetUp] Method: ' + procname() )
+return .T.
+
+method SetOne_2() class test_sample_class_full
+  ::nInt_1 += 3
+  ::nInt_2 += 2
+  conout( '  -> [OneTimeSetUp] Method: ' + procname() )
+return .T.
+
+method SetAll() class test_sample_class_full
+  ::nInt_1 += 5
+  ::nInt_2 += 1
+  conout( '    -> [SetUp] Method: ' + procname() )
+return .T.
+
+method FirstExampleMethod() class test_sample_class_full
+  ::nInt_max := max( ::nInt_1, ::nInt_2 )
+    assertEquals( ::nInt_max, 24 )
+  conout( '       -> [Test] Method: ' + procname() )
+return .T.
+
+method SecondExampleMethod() class test_sample_class_full
+  ::nInt_max := max( ::nInt_1, ::nInt_2 )
+    assertEquals( ::nInt_max, 26 )
+  conout( '       -> [Test] Method: ' + procname() )
+return .T.
+
+method DownAll() class test_sample_class_full
+  ::nInt_1 -= 2
+  conout( '    -> [TearDown] Method: ' + procname() )
+return .T.
+
+method DownOne() class test_sample_class_full
+  ::nInt_1 := 0
+  ::nInt_2 := 0
+  conout( '  -> [OneTimeTearDown] Method: ' + procname() )
+return .T.

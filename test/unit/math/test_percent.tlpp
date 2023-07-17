@@ -1,0 +1,65 @@
+#include 'tlpp-core.th'
+#include 'tlpp-probat.th'
+
+namespace  test.math
+
+using namespace tlpp.probat
+
+@TestFixture()
+function U_testCalculatePercent()
+
+  local cError := '' as character
+  local xValue
+  local xExpected
+
+  // 10%
+  // ---
+  if ( math.U_percent( 100, 10, @xValue, @cError ) )
+    xExpected := 10
+    assertEquals( xValue, xExpected )
+  else
+    assertError( cError )
+  endif
+
+  // 33,33% de grande valor
+  // ----------------------
+    if ( math.U_percent( 123456789, 33.33, @xValue, @cError ) )
+      xExpected := 41148147.7737
+      assertEquals( xValue, xExpected )
+    else
+      assertError( cError )
+    endif
+
+  // Valor Invalido
+  // --------------
+    if ( math.U_percent( '', 33.33, @xValue, @cError ) )
+      assertError( 'invalid return for math.U_percent() - first non-numeric parameter' )
+    else
+      xExpected := 'Invalid value!'
+      assertEquals( cError, xExpected, 'first non-numeric parameter' )
+    endif
+
+  // Percentual Invalido
+  // -------------------
+    if ( math.U_percent( 100, '', @xValue, @cError ) )
+      assertError( 'invalid return for math.U_percent() - second non-numeric parameter' )
+    else
+      xExpected := 'Invalid percent value!'
+      assertEquals( cError, xExpected, 'second non-numeric parameter' )
+    endif
+
+    if ( math.U_percent( 100, -1, @xValue, @cError ) )
+      assertError( 'invalid return for math.U_percent() - second parameter less than zero' )
+    else
+      xExpected := 'Invalid percent value!'
+      assertEquals( cError, xExpected, 'second parameter less than zero' )
+    endif
+
+    if ( math.U_percent( 100, 101, @xValue, @cError ) )
+      assertError( 'invalid return for math.U_percent() - second parameter greater than one hundred' )
+    else
+      xExpected := 'Invalid percent value!'
+      assertEquals( cError, xExpected, 'second parameter greater than one hundred' )
+    endif
+
+return .T.

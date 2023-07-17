@@ -6,17 +6,17 @@ namespace  test.tdd
 using namespace tlpp.probat
 
 @TestFixture()
-//@skip()
+//@skip() // o Skip nesse exemplo foi necessário antes da implementação de: \tlpp-probat-samples\src\tdd\tdd_sample.tlpp
 function U_test_tdd_sample_2()
 
   local xValue
   local xExpected
 
-  xValue    := src.tdd.U_sumNum( 2, 10 )
+  xValue    := tdd.U_sumNum( 2, 10 )
   xExpected := 12
     assertEquals( xValue, xExpected )
 
-  xValue    := src.tdd.U_sumNum( 20, 100 )
+  xValue    := tdd.U_sumNum( 20, 100 )
   xExpected := 120
     assertEquals( xValue, xExpected )
     assertGreaterOrEqual( xValue, xExpected )

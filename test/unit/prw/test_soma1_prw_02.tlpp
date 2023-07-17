@@ -1,0 +1,6 @@
+#include "tlpp-probat.th"
+
+@TestFixture()
+function U_testSoma1_prw_02()
+  U_tstSoma1()
+return .T.

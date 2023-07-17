@@ -1,0 +1,15 @@
+#include "tlpp-probat.th"
+
+namespace       test.tlpp
+
+// Tem que ser o penultimo a ser executado
+@TestFixture(thread="no")
+function U_test_sample_no_thread()
+
+  local cTest     := 'no_thread'
+  local xValue    := utils.U_echo( cTest )
+  local xExpected := cTest
+
+  tlpp.probat.assertEquals( xValue, xExpected )
+
+return .T.

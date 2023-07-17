@@ -1,0 +1,17 @@
+
+namespace   math
+
+function U_percent( nValue, nPercent, nValueCalculate, cError ) as logical
+
+  if ( valtype(nValue) <> 'N' )
+    cError := 'Invalid value!'
+    return .F.
+  endif
+  if ( valtype(nPercent) <> 'N' .or. nPercent < 0 .or. nPercent > 100 )
+    cError := 'Invalid percent value!'
+    return .F.
+  endif
+
+  nValueCalculate := ( nValue * (nPercent/100) )
+
+return .T.

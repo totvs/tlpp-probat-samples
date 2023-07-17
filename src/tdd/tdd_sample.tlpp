@@ -1,5 +1,5 @@
 
-namespace src.tdd
+namespace tdd
 
 function U_sumNum( nP1 as numeric, nP2 as numeric ) as numeric
 

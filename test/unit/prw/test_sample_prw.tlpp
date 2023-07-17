@@ -1,0 +1,28 @@
+#include "tlpp-probat.th"
+
+namespace       test.prw
+
+using namespace tlpp.probat
+
+@TestFixture(owner='sample',target='sample_sum_parameters.prw')
+function U_test_sample_prw()
+
+  local nResult := 0
+
+  nResult := U_sumParam( 10, 10 )
+  assertEquals( nResult, 20 )
+
+  nResult := U_sumParam( Nil, 10 )
+  assertEquals( nResult, 10 )
+
+  /*
+  NOTA: 
+  Deixamos propositalmente comentado para ficar claro o entendimento da
+  cobertura de codigo, pois o testes nao passara por:
+    sample_ok.prw | linha 11
+  
+  nResult := U_sumParam( 5, Nil )
+  assertEquals( nResult, 5 )
+  */
+
+return .T.

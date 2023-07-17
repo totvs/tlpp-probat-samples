@@ -1,7 +1,7 @@
 #include "tlpp-core.th"
 #include "tlpp-rest.th"
 
-namespace src.api
+namespace api
 
 @Get("/test/sample")
 function U_testRestGeneral()

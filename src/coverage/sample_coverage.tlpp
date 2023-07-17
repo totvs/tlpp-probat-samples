@@ -1,12 +1,12 @@
 
-namespace   src.coverage
+namespace   coverage
 
 function U_srcCoverage( nType as numeric ) as character
 
   local cChar := '' as character
 
   if ( valtype(nType) <> 'N' )
-    nType := 0
+    nType := 99
   endif
 
   do case
@@ -20,6 +20,8 @@ function U_srcCoverage( nType as numeric ) as character
       cChar := 'Oo'
     case ( nType == 5 )
       cChar := 'Uu'
+    case ( nType == 99)
+      cChar := ''
     otherwise
       cChar := '--'
   endcase

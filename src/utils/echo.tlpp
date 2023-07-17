@@ -1,0 +1,5 @@
+
+namespace utils
+
+function U_echo( cTest )
+return cTest
