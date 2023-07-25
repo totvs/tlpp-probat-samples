@@ -5,14 +5,20 @@ Na pasta RUN, temos os seguintes arquivos relativos aos scripts:<br>
 ..<br>
 └── run<br>
     ├── install.sh<br>
-    ├── preRun.sh<br>
-    └── run.sh<br>
+    ├── probat_config.sh<br>
+    ├── probat_functions.sh<br>
+    ├── probat_external.sh<br>
+    └── probat_run.sh<br>
 
 Para seguir com o uso, seguiremos os seguintes passos:
 
 ### 1 . Instalação do comando "probat"
 
-Visando facilitar o uso da automação do **PROBAT**, por este projeto disponibilizamos um script que "instala" o comando 'probat' em seu SO linux, também podendo ser utilizado em WSL [Subsistema do Windows para Linux].
+Visando facilitar o uso da automação do **PROBAT**, por este projeto disponibilizamos um script que "instala" o comando 'probat' em seu SO linux, também podendo ser utilizado em WSL [Subsistema do Windows para Linux] ou similares.
+
+> Caso você utilize Windows como SO e não tenha intimidade com WSL, faça uso dos artigos abaixo para conhecer melhor:
+> [O que é o Subsistema do Windows para Linux?](https://learn.microsoft.com/pt-br/windows/wsl/about)
+> [Instalar o Linux no Windows com o WSL](https://learn.microsoft.com/pt-br/windows/wsl/install)
 
 Ao baixar esse projeto, através do terminal do Linux ou da janela do WSL no Windows, vá até a pasta onde estão os scripts:
 
@@ -32,7 +38,7 @@ Agora você pode utilizar o comando 'probat' de qualquer diretório e em qualque
 
 ### 2 . Configuração do ambiente
 
-No arquivo [preRun.sh], nós iremos configurar todos os parâmetros de nosso ambiente para o correto funcionamento do script de automação do PROBAT.
+No arquivo [probat_config.sh], nós iremos configurar todos os parâmetros de nosso ambiente para o correto funcionamento do script de automação do PROBAT.
 Por ele, temos as seguintes variáveis para indicar:
 
 ##### APP_DIR
@@ -75,6 +81,14 @@ Indicamos o nome do arquivo INI de configuração do AppServer, podendo utilizar
 
 ```sh
 export APP_INI="appserver_SH.ini"
+```
+
+##### APP_INI_EXT
+
+Indicamos o nome do arquivo INI de configuração do AppServer, podendo utilizar um INI específico para execução do script para os envios dos eventos do script para o PROBAT.
+
+```sh
+export APP_INI_EXT="appserver_SH_external.ini"
 ```
 
 ##### SRC_DIR
@@ -128,7 +142,7 @@ Siga as instruções conforme documentação:
 
 ### 4 . Execução do comando
 
-Após a instalação do comando [probat] em seu SO ou WSL, configuração do [preRun.sh] e configuração do seu ambiente PROBAT, agora é possível executar o comando e disparar a automação do PROBAT através de seu terminal.
+Após a instalação do comando [probat] em seu SO ou WSL, configuração do [probat_config.sh] e configuração do seu ambiente PROBAT, agora é possível executar o comando e disparar a automação do PROBAT através de seu terminal.
 
 Portanto, temos as seguintes opções:
 
@@ -176,7 +190,25 @@ Caso não queria que a execução dos testes, então precisa informar ao comando
 probat -norun
 ```
 
-##### Combinando comandos
+##### Mensagens de Debug
+
+A opção default do comando, é não imprimir as mensagens de debug de alguns acontecimentos de seu script, ou indicarmos de forma explícita se queremos ou não essas mensagens, sendo:
+
+```sh
+probat
+```
+ou
+```sh
+probat -nodebug
+```
+
+Caso não queria que as mensagens sejam exibidas, então precisa informar ao comando, sendo:
+
+```sh
+probat -debug
+```
+
+#### Combinando comandos
 
 É possível combinar os comandos, conforme exemplos:
 
