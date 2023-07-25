@@ -44,7 +44,7 @@ O projeto possui a seguinte estrutura de diretórios:<br>
 
 #### [ /ini ]
 
-Na pasta INI temos dois arquivos .ini com configurações do AppServer, um para a subida normal do server e outro para ser utilizado pelo script.
+Na pasta INI temos dois arquivos .ini com configurações do AppServer, um para a subida normal do server e outros dois para serem utilizados pelo script.
 
 Dentro deles há a configuração do **PROBAT** utilizada.
 #### [ /run ]
