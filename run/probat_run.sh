@@ -70,16 +70,16 @@ else
   export PROBAT_RUN=1
   if [[ "${COMPILE}" == "BLOCK" || "${COMPILE}" == "NO" ]] ; then
     export PROBAT_COMPILE=0
-    export PROBAT_PLAN="1:probat_run 2:probat_export"
+    export PROBAT_PLAN="1:probat_run_Suite_minha_suite_ok 2:probat_run_ALL"
     export STEP_COMP=0
-    export STEP_RUN=1
-    export STEP_EXPORT=2
+    export STEP_RUN_SUITE=1
+    export STEP_RUN_ALL=2
   else
     export PROBAT_COMPILE=1
-    export PROBAT_PLAN="1:compilacao 2:probat_run 3:probat_export"
+    export PROBAT_PLAN="1:compilacao 2:probat_run_Suite_minha_suite_ok 3:probat_run_ALL"
     export STEP_COMP=1
-    export STEP_RUN=2
-    export STEP_EXPORT=3
+    export STEP_RUN_SUITE=2
+    export STEP_RUN_ALL=3
   fi
 fi
 
@@ -104,6 +104,8 @@ function RUN_TESTS()
 {
   EXEC_CMD=${1}
   EXEC_MSG=${2}
+  STEP_RUN=${3}
+  STEP_MSG=${4}
 
   logMsg ${EXEC_CMD}
   TIME_INI_STR=`date +"%y/%m/%d %H:%M:%S"`
@@ -115,7 +117,7 @@ function RUN_TESTS()
   TIME_DURAC_SEC=$((TIME_END - TIME_INI))
   logMsg "${EXEC_MSG} ret=${nRet} - ${TIME_INI_STR} - ${TIME_END_STR} (${TIME_DURAC_SEC} sec)"
 
-  assertExitCode ${STEP_RUN} ${nRet} command=tlpp.probat.run
+  assertExitCode ${STEP_RUN} ${nRet} command=tlpp.probat.run[${STEP_MSG}]
 }
 
 #----------------------------------------------------------#
@@ -131,7 +133,7 @@ function EXPORT_RESULTS()
   export nRet=$?
   logMsg "${EXEC_MSG} ret=${nRet}"
 
-  assertExitCode ${STEP_EXPORT} ${nRet} command=tlpp.probat.export
+  assertExitCode 99 ${nRet} untracked-command=tlpp.probat.export
 }
 
 #----------------------------------------------------------#
@@ -205,28 +207,28 @@ if [[ "${RUN}" != "BLOCK" ]] ; then
 
     #--------#
     # Step 2
-    # probat.run
+    # probat.run suite minha_suite_ok
     #--------#
 
-    startStep ${STEP_RUN}
+    startStep ${STEP_RUN_SUITE}
 
-      export EXEC="./${APP_EXE} "$(echo -console -consolelog -ini=${APP_INI} -allowexit -run=tlpp.probat.run -env=${APP_ENV} custom:${ID_EXEC_RUNTESTS})
-      RUN_TESTS "${EXEC}" "Finish run tests by PROBAT"
+      export EXEC="./${APP_EXE} "$(echo -console -consolelog -ini=${APP_INI} -allowexit -run=tlpp.probat.run -env=${APP_ENV} custom:${ID_EXEC_RUNTESTS} type:suite minha_suite_ok) 
+      RUN_TESTS "${EXEC}" "Finish run ALL tests by PROBAT" ${STEP_RUN_SUITE} "suite"
 
-    endStep ${STEP_RUN} ok
+    endStep ${STEP_RUN_SUITE} ok
 
 
     #--------#
     # Step 3
-    # probat.export
+    # probat.run ALL
     #--------#
 
-    startStep ${STEP_EXPORT}
+    startStep ${STEP_RUN_ALL}
 
-      export EXEC="./${APP_EXE} "$(echo -console -consolelog -ini=${APP_INI} -allowexit -run=tlpp.probat.export -env=${APP_ENV} type:custom ${ID_EXEC_RUNTESTS})
-      EXPORT_RESULTS "${EXEC}" "Export tests by PROBAT"
+      export EXEC="./${APP_EXE} "$(echo -console -consolelog -ini=${APP_INI} -allowexit -run=tlpp.probat.run -env=${APP_ENV} custom:${ID_EXEC_RUNTESTS})
+      RUN_TESTS "${EXEC}" "Finish run ALL tests by PROBAT" ${STEP_RUN_ALL} "all"
 
-    endStep ${STEP_EXPORT} ok
+    endStep ${STEP_RUN_ALL} ok
 
   else
     logMsg "User defined by [-norun] not to run PROBAT."
@@ -237,6 +239,10 @@ endScript
 
 # apuracao de resultados
 if [[ "${RUN}" == "YES" ]] ; then
+
+  export EXEC="./${APP_EXE} "$(echo -console -consolelog -ini=${APP_INI} -allowexit -run=tlpp.probat.export -env=${APP_ENV} type:custom ${ID_EXEC_RUNTESTS})
+  EXPORT_RESULTS "${EXEC}" "Export tests by PROBAT"
+
   RESULTS_CHECK
 fi
 
