@@ -190,6 +190,26 @@ Caso não queria que a execução dos testes, então precisa informar ao comando
 probat -norun
 ```
 
+##### Envio dos eventos para o PROBAT
+
+A opção default do comando, é não enviar os eventos de seu script para o PROBAT, ou indicarmos de forma explícita se queremos ou não que sejam enviados, sendo:
+
+```sh
+probat
+```
+ou
+```sh
+probat -noexternal
+```
+
+Caso queria que os eventos sejam enviados ao PROBAT, então precisa informar ao comando, sendo:
+
+```sh
+probat -external
+```
+
+> Saiba mais sobre esse recurso em: [Enviando eventos da automação para o PROBAT](https://tdn.totvs.com/pages/viewpage.action?pageId=778542566)
+
 ##### Mensagens de Debug
 
 A opção default do comando, é não imprimir as mensagens de debug de alguns acontecimentos de seu script, ou indicarmos de forma explícita se queremos ou não essas mensagens, sendo:
@@ -202,7 +222,7 @@ ou
 probat -nodebug
 ```
 
-Caso não queria que as mensagens sejam exibidas, então precisa informar ao comando, sendo:
+Caso queria que as mensagens sejam exibidas, então precisa informar ao comando, sendo:
 
 ```sh
 probat -debug
@@ -210,13 +230,17 @@ probat -debug
 
 #### Combinando comandos
 
-É possível combinar os comandos, conforme exemplos:
+É possível combinar os comandos entre si, conforme exemplos:
 
 ```sh
 probat -compile -run
 probat -nocompile -run
 probat -compile -norun
 probat -nocompile -norun
+
+probat -compile -run -debug
+
+probat -compile -run -external
 ```
 
 A ordem dos parâmetros podem ser mudadas que os efeitos permanecem iguais:
@@ -226,4 +250,37 @@ probat -run -compile
 probat -run -nocompile
 probat -norun -compile
 probat -norun -nocompile
+
+probat -run -debug -compile
+
+probat -run -external -compile
 ```
+
+##### Importante
+
+Os parâmetros não são obrigatórios, portanto podemos utilizá-los conforme necessidade, vejamos:
+
+<hr>
+
+```sh
+probat
+```
+Aqui estamos utilizando todos os parâmetros com seus valores default, ou seja:
+- -compile
+- -run
+- -noexternal
+- -nodebug
+
+<hr>
+
+```sh
+probat -nocompile
+```
+Aqui indicamos que queremos somente executar os testes, mas não compilar antes.
+
+<hr>
+
+```sh
+probat -norun
+```
+Aqui indicamos que queremos somente compilar os fontes, mas não executar os testes.
