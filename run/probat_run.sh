@@ -31,6 +31,7 @@ export COMPILE="YES"
 export RUN="YES"
 export VERSION="NO"
 export DEBUG="NO"
+export PROBAT_EXTERNAL="NO"
 num=1
 for arg in "$@"; do
   a="$arg"
@@ -43,6 +44,9 @@ for arg in "$@"; do
   fi
   if [[ "${a}" == *"-DEBUG"* ]] ; then
     export DEBUG="YES"
+  fi
+  if [[ "${a}" == *"-EXTERNAL"* ]] ; then
+    export PROBAT_EXTERNAL="YES"
   fi
   if [[ "${a}" == *"VERSION"* ]] ; then
     export VERSION="YES"
