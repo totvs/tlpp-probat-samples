@@ -18,8 +18,23 @@ function U_test_tdd_sample_2()
 
   xValue    := tdd.U_sumNum( 20, 100 )
   xExpected := 120
-    assertEquals( xValue, xExpected )
-    assertGreaterOrEqual( xValue, xExpected )
-    assertGreater( xValue, 100 )
+    /*
+    Aviso
+    Embora esse excesso de Asserts são desnecessários, queremos mostrar alguns pontos aqui:
+    1 - Toda função de Assert() retorna um valor lógico com o estado do teste, ou seja:
+        .T. (true)  = Test OK
+        .F. (false) = Test Error
+
+    2 - Existem mais funções de Assert() além da assertEquals(), veja mais em: 
+        https://tdn.totvs.com/display/tec/d+-+Asserts
+
+    3 - A função de Assert() te auxiliam na verificação de valores e geração de resultados, 
+        porém a assertividade do algorítimo de seu teste fica a critério de cada Dev/Equipe.
+    */
+    if ( assertGreater( xValue, 100 ) )
+      if ( assertGreaterOrEqual( xValue, xExpected ) )
+        assertEquals( xValue, xExpected ) // Somente esse Assert() já seria suficiente!
+      endif
+    endif
 
 return .T.
