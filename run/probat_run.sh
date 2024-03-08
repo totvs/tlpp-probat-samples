@@ -61,7 +61,6 @@ if [[ "${VERSION}" == "YES" ]] ; then
   exit 0
 fi
 
-
 #----------------------------------------------------------#
 # Validação para saber Plano de execução e
 # se irá utilizar a Execução Externa do PROBAT
@@ -76,14 +75,16 @@ else
     export PROBAT_COMPILE=0
     export PROBAT_PLAN="1:probat_run_Suite_minha_suite_ok 2:probat_run_ALL"
     export STEP_COMP=0
+	export STEP_COMP_TST=0
     export STEP_RUN_SUITE=1
     export STEP_RUN_ALL=2
   else
     export PROBAT_COMPILE=1
-    export PROBAT_PLAN="1:compilacao 2:probat_run_Suite_minha_suite_ok 3:probat_run_ALL"
+    export PROBAT_PLAN="1:compilacao 2:compilacao_testes 3:probat_run_Suite_minha_suite_ok 4:probat_run_ALL"
     export STEP_COMP=1
-    export STEP_RUN_SUITE=2
-    export STEP_RUN_ALL=3
+	export STEP_COMP_TST=2
+    export STEP_RUN_SUITE=3
+    export STEP_RUN_ALL=4
   fi
 fi
 
@@ -173,9 +174,11 @@ if [[ "${COMPILE}" != "BLOCK" ]] ; then
   #--------#
   if [[ "${COMPILE}" == "YES" ]] ; then
     
-    startStep ${STEP_COMP}
-
-      logMsg "     SRC_DIR: '${SRC_DIR}'"
+    # fontes projeto /SRC/
+	#--------------------#
+	startStep ${STEP_COMP}
+      
+	  logMsg "     SRC_DIR: '${SRC_DIR}'"
       logMsg "     APP_DIR: '${APP_DIR}${APP_EXE}'"
       logMsg ""
       export EXEC="./${APP_EXE} "$(echo -console -consolelog -compile -ini=${APP_INI} -files=${SRC_DIR} -includes=${INCLUDES_DIR} -env=${APP_ENV})
@@ -191,7 +194,30 @@ if [[ "${COMPILE}" != "BLOCK" ]] ; then
     endStep ${STEP_COMP} ok
 
     export nError=${nSysErrEXEC}
-    checkError "Fail compile ${APP_ENV}"
+    checkError "Fail compile SRC ${APP_ENV}"
+
+
+	# fontes projeto /TST/
+	#--------------------#
+	startStep ${STEP_COMP_TST}
+      
+	  logMsg "     TST_DIR: '${TST_DIR}'"
+      logMsg "     APP_DIR: '${APP_DIR}${APP_EXE}'"
+      logMsg ""
+      export EXEC="./${APP_EXE} "$(echo -console -consolelog -compile -ini=${APP_INI} -files=${TST_DIR} -includes=${INCLUDES_DIR} -env=${APP_ENV})
+      echo "         command -> ${EXEC}"
+      ${EXEC}
+      export nSysErrEXEC=$?
+
+      assertExitCode ${STEP_COMP_TST} ${nSysErrEXEC} command=compile
+
+      # TODO ler arquivos compilacao
+      # fileErrors conter 1 nome # assertError custom:${ID_EXEC_RUNTESTS})
+
+    endStep ${STEP_COMP_TST} ok
+
+    export nError=${nSysErrEXEC}
+    checkError "Fail compile TST ${APP_ENV}"
   else
     logMsg ""
     logMsg "User defined by [-nocompile] for sources will not be compiled."
