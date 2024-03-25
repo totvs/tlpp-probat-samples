@@ -236,26 +236,26 @@ if [[ "${RUN}" != "BLOCK" ]] ; then
   if [[ "${RUN}" == "YES" ]] ; then
 
     #--------#
-    # Step 2
+    # Step 2|3
     # probat.run suite minha_suite_ok
     #--------#
 
     startStep ${STEP_RUN_SUITE}
 
-      export EXEC="./${APP_EXE} "$(echo -console -consolelog -ini=${APP_INI} -allowexit -run=tlpp.probat.run -env=${APP_ENV} custom:${ID_EXEC_RUNTESTS} type:suite minha_suite_ok) 
+      export EXEC="./${APP_EXE} "$(echo -console -consolelog -ini=${APP_INI} -run=tlpp.probat.run -env=${APP_ENV} custom:${ID_EXEC_RUNTESTS} type:suite minha_suite_ok) 
       RUN_TESTS "${EXEC}" "Finish run ALL tests by PROBAT" ${STEP_RUN_SUITE} "suite"
 
     endStep ${STEP_RUN_SUITE} ok
 
 
     #--------#
-    # Step 3
+    # Step 3|4
     # probat.run ALL
     #--------#
 
     startStep ${STEP_RUN_ALL}
 
-      export EXEC="./${APP_EXE} "$(echo -console -consolelog -ini=${APP_INI} -allowexit -run=tlpp.probat.run -env=${APP_ENV} custom:${ID_EXEC_RUNTESTS})
+      export EXEC="./${APP_EXE} "$(echo -console -consolelog -ini=${APP_INI} -run=tlpp.probat.run -env=${APP_ENV} custom:${ID_EXEC_RUNTESTS})
       RUN_TESTS "${EXEC}" "Finish run ALL tests by PROBAT" ${STEP_RUN_ALL} "all"
 
     endStep ${STEP_RUN_ALL} ok
@@ -270,7 +270,7 @@ endScript
 # apuracao de resultados
 if [[ "${RUN}" == "YES" ]] ; then
 
-  export EXEC="./${APP_EXE} "$(echo -console -consolelog -ini=${APP_INI} -allowexit -run=tlpp.probat.export -env=${APP_ENV} type:custom ${ID_EXEC_RUNTESTS})
+  export EXEC="./${APP_EXE} "$(echo -console -consolelog -ini=${APP_INI} -run=tlpp.probat.export -env=${APP_ENV} type:custom ${ID_EXEC_RUNTESTS})
   EXPORT_RESULTS "${EXEC}" "Export tests by PROBAT"
 
   RESULTS_CHECK
