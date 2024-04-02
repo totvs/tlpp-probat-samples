@@ -3,28 +3,18 @@
 # Script central para automacao de testes utilizando PROBAT do tlppCore
 #
 # Autor: tlppCore
-# Date:  2023
+# Date:  2024
 #
 
 #----------------------------------------------------------#
 # INICIA PLANO DE TESTES
 #----------------------------------------------------------#
+export nError=0
 export LOCAL_DIR=$(pwd)
 
 
 #----------------------------------------------------------#
-# INICIA PLANO DE TESTES
-#----------------------------------------------------------#
-source ${1}/probat_config.sh
-source ${1}/probat_external.sh
-source ${1}/probat_functions.sh
-
-
-export nError=0
-
-
-#----------------------------------------------------------#
-# Trata valores de parametros recebidos via linha de comando 
+# Trata valores de parametros recebidos via linha de comando
 # e padroniza para o correto funcionamento do script
 #----------------------------------------------------------#
 export COMPILE="YES"
@@ -56,10 +46,73 @@ for arg in "$@"; do
   ((num++))
 done
 if [[ "${VERSION}" == "YES" ]] ; then
-  echo 'probat command version "01.01.00"'
+  echo 'probat command version "02.01.01"'
   cd "${LOCAL_DIR}"
   exit 0
 fi
+
+
+#----------------------------------------------------------#
+# VERIFICA SO
+#----------------------------------------------------------#
+export KERNEL_NAME=`uname -s`
+export KERNEL_RELEASE=`uname -r`
+export WINDOWS_LABEL="Microsoft|MINGW64_NT|CYGWIN_NT|MSYS_NT"
+if echo "${KERNEL_NAME} ${KERNEL_RELEASE}" | egrep -i -q "${WINDOWS_LABEL}"; then
+  export SYSTEM_OP="windows"
+else
+  export SYSTEM_OP="linux"
+fi
+echo ""
+echo "----------------------------------"
+echo "PROBAT Script running on [${SYSTEM_OP}]"
+echo "----------------------------------"
+echo ""
+
+
+#----------------------------------------------------------#
+# INICIA PLANO DE TESTES E CONFIGURACOES
+#----------------------------------------------------------#
+if [ "${SYSTEM_OP}" = "linux" ] ; then
+  source ${1}/probat_config_linux.sh
+else
+  source ${1}/probat_config_windows.sh
+fi
+source ${1}/probat_external.sh
+source ${1}/probat_functions.sh
+
+
+#----------------------------------------------------------#
+# COPIA INIS PARA BINARIO
+#----------------------------------------------------------#
+export EXEC="cp ${ROOT_DIR}ini/*.ini ${APP_DIR}. "
+logMsg ""
+logMsg "----------------------------------------"
+logMsg "copying ini files to appserver folder..."
+logMsg "----------------------------------------"
+logMsg " copy command -> ${EXEC}"
+${EXEC}
+export nSysErrEXEC=$?
+export nError=${nSysErrEXEC}
+checkError "Failed to copy INIs!"
+if [ "${nError}" == "0" ]; then
+    logMsg " >> copies of inis successfully << "
+fi
+
+
+#----------------------------------------------------------#
+# USO EXCLUSIVO DO DEVOPS DA TOTVSTEC
+#----------------------------------------------------------#
+if [ -f "${1}/sets_devops.sh" ]; then
+  logMsg ""
+  logMsg "------------------------"
+  logMsg "loading DevOps script..."
+  logMsg "------------------------"
+  logMsg ""
+  source ${1}/sets_devops.sh
+  setDevOpsConfigs "${APP_DIR}"
+fi
+
 
 #----------------------------------------------------------#
 # Validação para saber Plano de execução e
@@ -242,7 +295,7 @@ if [[ "${RUN}" != "BLOCK" ]] ; then
 
     startStep ${STEP_RUN_SUITE}
 
-      export EXEC="./${APP_EXE} "$(echo -console -consolelog -ini=${APP_INI} -run=tlpp.probat.run -env=${APP_ENV} custom:${ID_EXEC_RUNTESTS} type:suite minha_suite_ok) 
+      export EXEC="./${APP_EXE} "$(echo -console -consolelog -allowexit -runstartnormal -ini=${APP_INI} -run=tlpp.probat.run -env=${APP_ENV} custom:${ID_EXEC_RUNTESTS} type:suite minha_suite_ok)
       RUN_TESTS "${EXEC}" "Finish run ALL tests by PROBAT" ${STEP_RUN_SUITE} "suite"
 
     endStep ${STEP_RUN_SUITE} ok
@@ -255,7 +308,7 @@ if [[ "${RUN}" != "BLOCK" ]] ; then
 
     startStep ${STEP_RUN_ALL}
 
-      export EXEC="./${APP_EXE} "$(echo -console -consolelog -ini=${APP_INI} -run=tlpp.probat.run -env=${APP_ENV} custom:${ID_EXEC_RUNTESTS})
+      export EXEC="./${APP_EXE} "$(echo -console -consolelog -allowexit -runstartnormal -ini=${APP_INI} -run=tlpp.probat.run -env=${APP_ENV} custom:${ID_EXEC_RUNTESTS})
       RUN_TESTS "${EXEC}" "Finish run ALL tests by PROBAT" ${STEP_RUN_ALL} "all"
 
     endStep ${STEP_RUN_ALL} ok
@@ -270,7 +323,7 @@ endScript
 # apuracao de resultados
 if [[ "${RUN}" == "YES" ]] ; then
 
-  export EXEC="./${APP_EXE} "$(echo -console -consolelog -ini=${APP_INI} -run=tlpp.probat.export -env=${APP_ENV} type:custom ${ID_EXEC_RUNTESTS})
+  export EXEC="./${APP_EXE} "$(echo -console -consolelog -allowexit -runstartnormal -ini=${APP_INI} -run=tlpp.probat.export -env=${APP_ENV} type:custom ${ID_EXEC_RUNTESTS})
   EXPORT_RESULTS "${EXEC}" "Export tests by PROBAT"
 
   RESULTS_CHECK
