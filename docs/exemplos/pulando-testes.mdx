@@ -1,0 +1,151 @@
+---
+title: Pulando testes
+sidebar_label: Pulando testes
+sidebar_position: 6
+displayed_sidebar: restSidebar
+---
+
+import ExemploRef from '@site/src/components/ExemploRef';
+
+# Pulando testes — `@Skip` e `SKIPASSERT`
+
+Pular testes deve ser evitado — um teste existe para forçar correções. Mas há situações legítimas: pendências fora da sua gerência, comportamentos que variam por versão do AppServer/tlppCore, sistema operacional ou banco de dados. Para esses casos, o PROBAT oferece o "pulo" **registrado**: o teste não quebra o plano, mas é exportado como **skipped** — o salto fica visível nos resultados.
+
+Há duas granularidades: pular a **função, classe ou método inteiro** (`@Skip`) ou pular apenas **o próximo assert** (`SKIPASSERT`).
+
+## `@Skip()` — pula função, classe ou método
+
+Independentemente de quantos asserts existam no escopo, o PROBAT registra **um único** salto, referenciando a função, classe ou método (não o conteúdo):
+
+```tlpp
+// Em função
+@TestFixture(owner='sample')
+@Skip()
+function U_test_function_Skip()
+  assertError( 'nao deve registrar esse assert' )
+return .T.
+```
+
+```tlpp
+// Em classe inteira
+@TestFixture()
+@Skip()
+class test_class_skip
+  // ...
+endclass
+```
+
+```tlpp
+// Em método de classe
+@Test('Exemplo para uso do PROBAT. SKIP ')
+@Skip()
+public method ExampleForUseSkip()
+```
+
+## `SKIPASSERT` — pula somente o próximo assert
+
+Comando inserido no fonte logo antes do assert. O pulo vale **apenas para o próximo assert executado** — os asserts seguintes rodam normalmente. O salto é registrado referenciando o assert pulado:
+
+```tlpp
+@TestFixture()
+user function test_sample_skip_assert()
+
+  local cVar := ""  as character
+  local nVar := 0   as numeric
+  local fVar        as decimal
+
+  assertEquals( valtype(cVar), "C" ) // registra
+
+  SKIPASSERT // pula somente o proximo assert executado
+  assertEquals( valtype(fVar), "F" ) // pula
+
+  assertEquals( valtype(nVar), "N" ) // registra
+
+return .T.
+```
+
+Funciona em funções e em métodos de classe.
+
+## Skip condicional (filtros)
+
+Tanto `@Skip` quanto `SKIPASSERT` aceitam **seis filtros** — o teste só é pulado quando a condição casa com o ambiente:
+
+| Filtro | Annotation | Comando | Disponível desde |
+|--------|------------|---------|------------------|
+| Sistema operacional | `@Skip( system="windows" )` | `SKIPASSERT SYSTEM "linux"` | — |
+| Versão tlppCore | `@Skip( tlppVersion=">= 01.02.12" )` | `SKIPASSERT TLPPVERSION "< 01.02.12"` | — |
+| Versão AppServer | `@Skip( appServerVersion=">= 19.3.1.7" )` | `SKIPASSERT APPSERVERVERSION "19.3.1.5"` | — |
+| Nome AppServer | `@Skip( appServerName="HARPIA" )` | `SKIPASSERT APPSERVERNAME "LOBO-GUARA"` | — |
+| Banco de dados | `@Skip( database="MSSQL" )` | `SKIPASSERT DATABASE "MSSQL"` | 01.04.10 |
+| Função customizada | `@Skip( custom="U_customSkip" )` | `SKIPASSERT CUSTOM "U_customSkip"` | 01.04.10 |
+
+As versões aceitam operadores de comparação na própria string: `"01.02.10"` (igual), `"< 01.02.12"` (abaixo de), `">= 01.02.12"` (a partir de).
+
+### Exemplos com annotation
+
+```tlpp
+@TestFixture(owner='sample')
+@Skip(tlppVersion=">= 01.02.10")
+function U_test_function_Skip_1()
+  assertError( 'nao deve registrar esse assert' )
+return .T.
+
+@TestFixture(owner='sample')
+@Skip(system="windows")
+function U_test_function_Skip_2()
+  assertError( 'nao deve registrar esse assert' )
+return .T.
+
+@TestFixture(owner='sample')
+@Skip(appServerName="HARPIA")
+function U_test_function_Skip_3()
+  assertError( 'nao deve registrar esse assert' )
+return .T.
+```
+
+### Exemplos com comando
+
+```tlpp
+@TestFixture(owner='sample')
+function U_test_function_Skip_5()
+
+  SKIPASSERT TLPPVERSION ">= 01.02.10"
+  assertError( 'nao deve registrar esse assert' )
+
+  SKIPASSERT SYSTEM "windows"
+  assertError( 'nao deve registrar esse assert' )
+
+  SKIPASSERT APPSERVERNAME "HARPIA"
+  assertError( 'nao deve registrar esse assert' )
+
+return .T.
+```
+
+### Combinando filtros
+
+Pode-se juntar até os seis filtros no mesmo skip. O operador entre eles é sempre **AND** — todas as condições precisam ser válidas para o pulo acontecer:
+
+```tlpp
+@Skip( system="linux", appServerName="HARPIA" )
+SKIPASSERT SYSTEM "linux" APPSERVERNAME "HARPIA"
+```
+
+### Função customizada
+
+O filtro `custom` delega a decisão a uma função sua (AdvPL ou TLPP, `Function` ou `User Function`). Ela recebe dados do contexto — mantenha a assinatura mesmo que não use os parâmetros:
+
+```tlpp
+user function customSkip( cNameClass, cNameFunction, cSource, lUnix, cBinName, cBinVersion, cTlppVersion )
+
+  local lSkip as logical
+
+  lSkip := ( cSource $ test.SkipSourcesList() )
+
+return lSkip
+```
+
+Retorno `.T.` pula o teste; `.F.` executa normalmente.
+
+> Documentação oficial: [e-4 - Pulando Testes](https://tdn.totvs.com/display/tec/e-4+-+Pulando+Testes).
+
+<ExemploRef repo="probat-samples" file="test_sample_skip.tlpp" path="test/probat_resources" />

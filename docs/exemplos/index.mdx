@@ -1,0 +1,83 @@
+---
+title: PROBAT — engine de testes
+sidebar_label: Visão geral
+sidebar_position: 1
+displayed_sidebar: restSidebar
+---
+
+import RepoLink from '@site/src/components/RepoLink';
+
+# PROBAT — engine de testes do tlppCore
+
+O **PROBAT** é o conjunto de ferramentas nativas do tlppCore para criação e execução de testes em programas **TLPP** ou **AdvPL** — testes unitários, funcionais e integrados, com cobertura de código, histórico de execuções, suporte a TDD e integração com esteiras de CI/CD.
+
+O nome vem do latim e remete a **prova / teste**. A ferramenta nasceu em 2017 como motor de testes unitários do próprio tlppCore e evoluiu para um motor de testes completo — REST, testes integrados, GUI nativa e automação DevOps — até ser promovida a produto expedido no `tlpp.rpo`.
+
+Os exemplos desta seção vivem em <RepoLink id="probat-samples" />.
+
+:::info Disponibilidade
+- Expedido no pacote oficial do tlppCore (`tlpp.rpo`) a partir do **AppServer Harpia 20.3.1.x**
+- Funciona somente a partir do binário **7.00.170117A (Lobo-Guará)**
+- Para testar fontes **AdvPL**, o teste deve obrigatoriamente ser escrito em **TLPP**
+- Não possui recursos para testes de **interface** (telas)
+:::
+
+## O que o PROBAT oferece
+
+| Recurso | O que resolve |
+|---------|---------------|
+| **Testes unitários, funcionais e integrados** | Valida se o software cumpre as funcionalidades projetadas |
+| **Cobertura de código** | Mostra se o plano de testes de fato percorre todo o código |
+| **Histórico em banco** | Resultados persistidos em SQLite (ou DBAccess) para consulta e comparação |
+| **TDD** | Permite desenvolver guiado por testes (Test-driven development) |
+| **Automação** | Esteira de testes disparada por scripts, com captura de eventos externos |
+| **Export de resultados** | XML no formato **JUnit** — consumível por Jenkins, GitLab CI, GitHub Actions etc. |
+| **Interface gráfica** | GUI nativa via `tlpp.probat.gui()` para executar e consultar históricos |
+
+## Verificando a instalação
+
+Antes de começar, confirme se o PROBAT está disponível no seu ambiente:
+
+```tlpp
+function sampleIsProbat()
+
+  local jModule
+
+  if ( tlpp.module( 'PROBAT', @jModule ) )
+    conout( 'Ferramenta: ' + jModule['module'] )
+    conout( 'Instalado?: ' + if( jModule['linked'], 'sim', 'nao' ) )
+    conout( 'Versão....: ' + jModule['version'] )
+  else
+    conout( ' >> Ferramenta não instalada <<' )
+  endif
+
+return Nil
+```
+
+## Estrutura do repositório de exemplos
+
+| Pasta | Conteúdo |
+|-------|----------|
+| `ini/` | INIs do AppServer com a seção `[PROBAT]` configurada — ver [Configuração](/docs/tlpp/probat/configuracao) |
+| `run/` | Scripts de automação e o `main.prw` — ver [Automação](/docs/tlpp/probat/automacao-scripts) |
+| `src/` | Fontes "de produção" que serão testados (no seu projeto, é o código oficial) |
+| `test/` | Implementações dos testes com a sintaxe do PROBAT, organizadas por tema |
+
+## Trilha sugerida
+
+1. [Configuração](/docs/tlpp/probat/configuracao) — arquitetura de diretórios, seção `[PROBAT]` do INI e configuração por código
+2. [Annotations](/docs/tlpp/probat/annotations) — `@TestFixture` e propriedades, `@Test`, setups e teardowns
+3. [Testes em função e classe](/docs/tlpp/probat/testes-funcao-classe) — as duas formas de escrever testes
+4. [Asserts](/docs/tlpp/probat/asserts) — catálogo completo de verificações
+5. [Pulando testes](/docs/tlpp/probat/pulando-testes) e [Error Log](/docs/tlpp/probat/error-log)
+6. [Suites e execução apartada](/docs/tlpp/probat/suites-execucao) — suites exclusivas, thread e prioridade
+7. [Cobertura de código](/docs/tlpp/probat/cobertura)
+8. [Execução e resultados](/docs/tlpp/probat/execucao-resultados) — discovery, modos da `run()`, export JUnit e histórico
+9. Cenários reais: [API REST](/docs/tlpp/probat/testes-api-rest), [banco de dados](/docs/tlpp/probat/integracao-bd) e [TDD](/docs/tlpp/probat/tdd)
+10. [Automação e comando `probat`](/docs/tlpp/probat/automacao-scripts) — scripts, eventos externos e CI/CD
+
+## Referências oficiais
+
+- Documentação técnica no TDN: [tdn.totvs.com/display/tec/PROBAT](https://tdn.totvs.com/display/tec/PROBAT)
+- Vídeo [Iniciando no PROBAT](https://www.youtube.com/watch?v=covZWUvXwRA) no canal da TOTVS
+- Sugestões e melhorias: [issues do repositório](https://github.com/totvs/tlpp-probat-samples/issues)

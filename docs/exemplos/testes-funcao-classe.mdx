@@ -1,0 +1,115 @@
+---
+title: Testes em função e classe
+sidebar_label: Função e classe
+sidebar_position: 4
+displayed_sidebar: restSidebar
+---
+
+import ExemploRef from '@site/src/components/ExemploRef';
+
+# Testes em função e em classe
+
+O PROBAT aceita testes escritos de duas formas: **função** (mais direto) ou **classe** (habilita `@Test` por método, setups e teardowns). Regras que valem para as duas formas:
+
+- Importar a include `tlpp-probat.th`
+- Marcar com `@TestFixture`
+- Executar ao menos **uma função de assert** — sem assert, não há resultado registrado
+- **Sempre retornar `.T.`** — a menos que você estruture o teste para retornar `.F.` em alguns casos, gerando erro automático ao final da execução
+- Compilar o fonte no mesmo ambiente onde os testes serão executados
+
+## Teste em função
+
+A forma mais enxuta e menos verbosa — indicada para validações simples e para quem tem menos familiaridade com orientação a objetos:
+
+```tlpp
+#include "tlpp-probat.th"
+
+namespace       test.tlpp
+
+@TestFixture(owner='sample',target="sample_ok.tlpp")
+function U_test_sample_function()
+
+  local cTest     := 'test_1'
+  local xValue    := tlpp.U_sampleOK( cTest )
+  local xExpected := cTest
+
+  tlpp.probat.assertEquals( xValue, xExpected , 'tlpp.U_sampleOK( cTest )' )
+
+return .T.
+```
+
+A facilidade tem um custo: a função não dispõe dos recursos avançados de estruturação (ciclo de vida, vários testes por alvo com estado compartilhado).
+
+> Documentação oficial: [Teste simples com função](https://tdn.totvs.com/pages/viewpage.action?pageId=654948020).
+
+<ExemploRef repo="probat-samples" file="test_sample_function.tlpp" path="test/probat_resources" />
+
+## Teste em classe
+
+Com classe entra a include `tlpp-core.th` e cada método de teste é anotado com `@Test('descrição')`. Com `using namespace tlpp.probat`, os asserts são chamados sem prefixo:
+
+```tlpp
+#include "tlpp-core.th"
+#include "tlpp-probat.th"
+
+namespace       test.tlpp
+
+using namespace tlpp.probat
+
+#define _str_ "teste_class"
+
+@TestFixture(owner='sample',target="sample_ok.tlpp")
+class test_sample_class
+
+  private data cTeste     as character
+
+  public method new()     constructor
+
+  @Test('aqui deve-se colocar o descritivo sobre o teste')
+  public method test_sampleOK()
+
+endclass
+
+method new() class test_sample_class
+  ::cTeste := _str_
+return self
+
+method test_sampleOK() class test_sample_class
+
+  local cValue := tlpp.U_sampleOK( _str_ )
+
+              // Result, Expected
+  assertEquals( cValue , ::cTeste )
+
+return .T.
+```
+
+Além do `@Test` por método, a classe habilita o ciclo de vida completo (`@OneTimeSetUp`, `@Setup`, `@TearDown`, `@OneTimeTearDown`) — ver [Annotations](/docs/tlpp/probat/annotations#setups-e-teardowns-ciclo-de-vida).
+
+> Documentação oficial: [b - Teste simples com classe](https://tdn.totvs.com/display/tec/b+-+Teste+simples+com+classe).
+
+<ExemploRef repo="probat-samples" file="test_sample_class.tlpp" path="test/probat_resources" />
+
+## Quando usar cada forma
+
+| Cenário | Forma indicada |
+|---------|----------------|
+| Validação pontual de uma função | Função |
+| Vários testes sobre o mesmo alvo, com estado compartilhado | Classe |
+| Precisa de `@Setup` / `@TearDown` (BD, massa de dados) | Classe |
+| Time com pouca familiaridade com orientação a objetos | Função |
+
+## Testando fontes AdvPL
+
+Testes são sempre escritos em **TLPP**, mas o código testado pode ser AdvPL (`.prw`). O exemplo `test/unit/prw/test_sample_prw.tlpp` cobre a função de `src/prw/sample_sum_parameters.prw`.
+
+## Exemplos no repositório
+
+| Arquivo | O que demonstra |
+|---------|-----------------|
+| `test/probat_resources/test_sample_function.tlpp` | Teste mínimo em função |
+| `test/probat_resources/test_sample_class.tlpp` | Teste mínimo em classe |
+| `test/probat_resources/test_sample_class_full.tlpp` | Classe completa com vários métodos e ciclo de vida |
+| `test/unit/utils/test_echo_with_function.tlpp` | Teste unitário em função |
+| `test/unit/utils/test_echo_with_class.tlpp` | Teste unitário em classe |
+| `test/unit/prw/test_sample_prw.tlpp` | Teste TLPP cobrindo fonte `.prw` (AdvPL) |

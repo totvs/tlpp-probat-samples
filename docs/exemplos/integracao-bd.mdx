@@ -1,0 +1,105 @@
+---
+title: Integração com banco de dados
+sidebar_label: Integração com BD
+sidebar_position: 12
+displayed_sidebar: restSidebar
+---
+
+import ExemploRef from '@site/src/components/ExemploRef';
+
+# Testes integrados com banco de dados
+
+O exemplo `test/integration/test_db.tlpp` mostra o padrão completo de um teste integrado: **classe** com ciclo de vida (`@OneTimeSetUp` → `@Setup` → testes → `@TearDown` → `@OneTimeTearDown`) operando uma tabela via TopConnect.
+
+Ele pertence à suite exclusiva `bd` — não roda no modo "all", só quando a suite é executada explicitamente (ver [Suites e execução](/docs/tlpp/probat/suites-execucao)).
+
+## Estrutura da classe
+
+```tlpp
+@TestFixture( suite="bd" )
+class test_db
+
+  private data nConn      as numeric
+  private data lConn      as logical
+  private data cTable     as character
+
+  public method new()     constructor
+
+  // Setups
+    @OneTimeSetUp()
+    public method setConn()      // conecta no BD (uma vez)
+
+    @Setup()
+    public method setTable()     // cria tabela + carga inicial (antes de cada teste)
+
+  // Tests
+    @Test('test method for DB update')
+    public method test01_update()
+
+    @Test('test method for DB insert')
+    public method test02_insert()
+
+  // TearDowns
+    @TearDown()
+    public method clearTable()   // limpa registros (depois de cada teste)
+
+    @OneTimeTearDown()
+    public method closeConn()    // apaga tabela e desconecta (uma vez)
+
+endclass
+```
+
+## Pontos de atenção do exemplo
+
+### Conexão lida do próprio INI
+
+O `@OneTimeSetUp` monta a conexão TopConnect lendo `DBDATABASE`, `DBALIAS`, `DBSERVER` e `DBPORT` do ambiente atual — o teste roda em qualquer ambiente sem hardcode:
+
+```tlpp
+method setConn() class test_db
+  cEnv  := GetEnvServer()
+  cIni  := GetSrvIniName()
+    cDB   :=      GetPvProfString( cEnv, 'DBDATABASE', '', cIni )
+    cDsn  :=      GetPvProfString( cEnv, 'DBALIAS'   , '', cIni )
+    cSrv  :=      GetPvProfString( cEnv, 'DBSERVER'  , '', cIni )
+    nPort := val( GetPvProfString( cEnv, 'DBPORT'    , '', cIni ) )
+
+  ::lConn := ( (::nConn := TcLink( cDB+'/'+cDsn, cSrv, nPort)) >= 0 )
+
+    assertGreaterOrEqual( 0 , ::nConn )
+    assertTrue( ::lConn, 'TcLink' )
+return .T.
+```
+
+### Asserts também nos setups e teardowns
+
+Cada etapa do ciclo valida a si mesma (`assertTrue( lCreate, 'dbCreate' )`, `assertTrue( lUnLink, 'TcUnLink' )`) — se a preparação falhar, o resultado mostra exatamente onde.
+
+### Cenário isolado por teste
+
+O `@Setup` recria a carga inicial e o `@TearDown` executa `DELETE FROM` — cada `@Test` começa com a tabela em estado conhecido:
+
+```tlpp
+method test01_update() class test_db
+
+  // Realiza Update do registro
+    dbSelectArea( ::cAlias )
+    dbRLock( Recno() )
+      ( ::cAlias )->ID    := cNewID
+      ( ::cAlias )->DESCR := cNewDescr
+      dbCommit()
+    dbRUnLock( Recno() )
+
+  // Verifica quais dados estao na tabela
+    cQry := 'SELECT * FROM ' + ::cTable
+    dbUseArea(.T., "TOPCONN", TCGenQry(NIL,NIL,cQry), (cAlias) , .F., .T. )
+
+      assertEquals( (cAlias)->ID   , cNewID    )
+      assertEquals( (cAlias)->DESCR, cNewDescr )
+
+    (cAlias)->( dbCloseArea() )
+
+return .T.
+```
+
+<ExemploRef repo="probat-samples" file="test_db.tlpp" path="test/integration" />

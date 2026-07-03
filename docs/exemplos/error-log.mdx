@@ -1,0 +1,66 @@
+---
+title: Error Log
+sidebar_label: Error Log
+sidebar_position: 7
+displayed_sidebar: restSidebar
+---
+
+import ExemploRef from '@site/src/components/ExemploRef';
+
+# Error Log — `@ErrorLog`
+
+Alguns cenários **devem** gerar erro de execução (error log) — por exemplo, validar que uma função quebra com tipo inválido. Como o PROBAT captura automaticamente erros catastróficos e os transforma em resultado **negativo**, é preciso avisá-lo de que o erro é esperado.
+
+A annotation `@ErrorLog('descrição do erro')` inverte a lógica: o teste **passa** se o error log ocorrer em runtime e contiver o trecho informado. A descrição do erro esperado é **obrigatória**. Use-a junto com `@Test` (métodos) ou `@TestFixture` (funções).
+
+## Em método de classe
+
+```tlpp
+#include "tlpp-core.th"
+#include "tlpp-probat.th"
+
+namespace       test.tlpp
+
+@TestFixture(owner='sample',target="sample_error.tlpp")
+class test_class_errorLog
+
+  public method new()     constructor
+
+  @Test('exemplo de teste com error log')
+  @ErrorLog('type mismatch')
+  public method ExampleForUseErrorLog()
+
+endclass
+
+method new() class test_class_errorLog
+return self
+
+method ExampleForUseErrorLog() class test_class_errorLog
+  tlpp.U_SAMPLEERROR()
+return .T.
+```
+
+## Em função
+
+```tlpp
+@TestFixture(owner='sample',target="sample_error.tlpp")
+@ErrorLog('type mismatch')
+function U_test_function_errorLog()
+  tlpp.U_SAMPLEERROR()
+return .T.
+```
+
+O fonte alvo (`src/tlpp/sample_error.tlpp`) força propositalmente um *type mismatch* — comparando string com booleano. O PROBAT captura o error log, compara com o trecho `'type mismatch'` e registra resultado positivo.
+
+## Regras de casamento
+
+- O resultado só é positivo se o error log ocorrido **contiver o trecho declarado**. Se a annotation trouxer qualquer outra descrição, o resultado é **negativo** — não é o erro esperado
+- Sem `@ErrorLog`, um error log durante o teste gera **falha** no XML de resultados, com o error log encontrado na execução da thread
+
+## Alternativa: asserts de error log
+
+Para validar erro em uma instrução **específica** (e não no teste inteiro), existem `assertHasErrorLog` e `assertNoHasErrorLog`, que macroexecutam a instrução dentro de um `Try...Catch` — ver [Asserts](/docs/tlpp/probat/asserts#error-log-macroexecução).
+
+> Documentação oficial: [e-7 - Error Log](https://tdn.totvs.com/display/tec/e-7+-+Error+Log).
+
+<ExemploRef repo="probat-samples" file="test_sample_error_log.tlpp" path="test/probat_resources" />

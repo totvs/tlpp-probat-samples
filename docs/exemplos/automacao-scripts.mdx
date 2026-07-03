@@ -1,0 +1,159 @@
+---
+title: Automação e comando probat
+sidebar_label: Automação
+sidebar_position: 14
+displayed_sidebar: restSidebar
+---
+
+import ExemploRef from '@site/src/components/ExemploRef';
+import RepoLink from '@site/src/components/RepoLink';
+
+# Automação — comando `probat` e execução por código
+
+Com práticas de DevOps, a esteira de testes deixa de ser manual: compilação, execução e exportação de resultados rodam de forma automatizada e contínua, com detecção precoce de bugs e regressões. O PROBAT atua dominantemente na fase de **testes**, mas também apoia as fases de code, build e release — via script de automação, exportação em formatos reconhecidos pelas ferramentas de CI/CD (JUnit, COBERTURA) e extensão do VSCode.
+
+A pasta <RepoLink id="probat-samples" path="run">`run/`</RepoLink> traz duas formas de automatizar a esteira: um **comando `probat`** instalável no Linux/WSL e o fonte **`main.prw`** que encadeia a execução por código TLPP.
+
+## Instalando o comando `probat`
+
+Requer Linux ou WSL (Subsistema do Windows para Linux). Na pasta `run/` do repositório:
+
+```bash
+cd /mnt/d/tlpp-probat-samples/run
+./install.sh
+```
+
+Depois disso o comando `probat` funciona de qualquer diretório e sessão do terminal.
+
+## Configurando o ambiente (`probat_config`)
+
+O script de configuração exporta as variáveis que apontam para o seu ambiente (há variantes `probat_config_linux.sh` e `probat_config_windows.sh`):
+
+| Variável | O que indica | Exemplo |
+|----------|--------------|---------|
+| `APP_DIR` | Diretório do binário do AppServer | `/mnt/d/tlppcore/bin_20.3.1.x/` |
+| `APP_EXE` | Nome do executável | `appserver.exe` ou `appserverlinux` |
+| `APP_ENV` | Ambiente de compilação/execução | `TLPPCORE` |
+| `APP_INI` | INI usado pelo script | `appserver_SH.ini` |
+| `APP_INI_EXT` | INI para envio de eventos externos | `appserver_SH_external.ini` |
+| `SRC_DIR` | Fontes do projeto e de testes | `D:\probat_samples\src` |
+| `INCLUDES_DIR` | Includes TH/CH para compilação | `D:\tlppcore\includes;D:\tlppcore\includes_dev` |
+| `TESTS_RESULT` | XML de resultados gerado ao final | `.../root/system/testsresults.xml` |
+
+## Usando o comando
+
+| Comando | Efeito |
+|---------|--------|
+| `probat` | Compila **e** executa (defaults: `-compile -run -noexternal -nodebug`) |
+| `probat -version` | Mostra a versão instalada |
+| `probat -nocompile` | Só executa os testes, sem compilar |
+| `probat -norun` | Só compila, sem executar |
+| `probat -external` | Envia os eventos do script para o PROBAT |
+| `probat -debug` | Imprime mensagens de debug do script |
+
+Os parâmetros podem ser combinados em qualquer ordem:
+
+```bash
+probat -compile -run
+probat -nocompile -run
+probat -compile -run -debug
+probat -run -external -compile
+```
+
+> Saiba mais: [Enviando eventos da automação para o PROBAT](https://tdn.totvs.com/pages/viewpage.action?pageId=778542566).
+
+## Execução por código — `main.prw`
+
+O `run/main.prw` mostra outra forma de encadear a esteira: a **descoberta** dos fontes de teste é apartada da execução; roda-se primeiro a suite exclusiva, depois todos os testes, e ao final exporta-se tudo com uma chave `custom` que unifica os resultados:
+
+```tlpp
+function U_testRun()
+
+  local cKey := "Hgk34Gnm90-" + strTran( time(), ":", "-" )
+
+  // Verifica se o modulo PROBAT esta instalado
+  if ( tlpp.module( 'PROBAT', @jModule ) )
+
+    // 1. Descoberta dos fontes de testes
+    tlpp.probat.discovery()
+
+    // 2. Executa a suite que nao roda em modo ALL
+    tlpp.probat.runOffCoverage( "type:suite", "minha_suite_ok", "custom:"+cKey )
+
+    // 3. Executa todos os testes em modo ALL
+    tlpp.probat.run( "custom:"+cKey )
+
+    // 4. Exporta os resultados de todas as execucoes acima
+    tlpp.probat.export( "type:custom", cKey )
+
+  endif
+return
+```
+
+| Função | Papel |
+|--------|-------|
+| `tlpp.module('PROBAT', @jModule)` | Verifica instalação/versão do módulo |
+| `tlpp.probat.discovery()` | Descobre os fontes de teste compilados |
+| `tlpp.probat.runOffCoverage(...)` | Executa um recorte (aqui, uma suite) sem cobertura |
+| `tlpp.probat.run(...)` | Executa todos os testes |
+| `tlpp.probat.export(...)` | Exporta os resultados (formato definido no INI, ex.: JUnit) |
+
+A chave `custom` é o que **unifica** as execuções na exportação — ver [Execução e resultados](/docs/tlpp/probat/execucao-resultados#identificador-customizado).
+
+<ExemploRef repo="probat-samples" file="main.prw" path="run" />
+
+## Eventos externos — `tlpp.probat.over.*`
+
+:::info Disponibilidade
+Recurso disponível a partir do **AppServer 20.3.1.13** e **tlppCore 01.04.04**.
+:::
+
+Em uma esteira automatizada, cada ferramenta tem seu próprio log — e nenhuma enxerga o das outras. Se um teste falha, o PROBAT mostra; mas se o problema ocorre **no script** (clone, compilação, subida do servidor), a informação fica descentralizada e o troubleshooting vira caça ao tesouro.
+
+O namespace `tlpp.probat.over` resolve isso: o processo externo (um shell script, por exemplo) envia seus eventos ao PROBAT usando o **mesmo identificador customizado** das execuções reais. Na exportação, os eventos externos entram como uma suíte destacada — se o script teve um erro, o resultado final é negativo mesmo com todos os testes passando.
+
+Todas são Main Functions, executáveis pela linha de comando do AppServer. É exatamente o que o parâmetro `-external` do comando `probat` aciona.
+
+### Início e fim do processo
+
+```bash
+./appserver.exe -env=ENV_NAME -run=tlpp.probat.over.startScript custom:id123456789ext
+./appserver.exe -env=ENV_NAME -run=tlpp.probat.over.endScript   custom:id123456789ext
+```
+
+### Asserts externos
+
+| Função | Efeito |
+|--------|--------|
+| `over.assertOK` | Registra resultado **positivo** para a execução externa |
+| `over.assertError` | Registra resultado **negativo** |
+| `over.assertWarning` | Registra **aviso** |
+| `over.assertExitCode` | Valida o exit code de um comando — `0` gera positivo, diferente gera negativo |
+
+```bash
+./appserver.exe -env=TLPPCORE -run=tlpp.probat.over.assertOK       custom:id123456789ext step:1 "message:command>git clone done"
+./appserver.exe -env=TLPPCORE -run=tlpp.probat.over.assertError    custom:id123456789ext step:2 "message:command> compile with error"
+./appserver.exe -env=TLPPCORE -run=tlpp.probat.over.assertExitCode custom:id123456789ext step:3 exitCode:0 "message:command>tlpp.probat.run"
+```
+
+Mensagens com espaços devem ir com o parâmetro inteiro entre aspas.
+
+### Plano de execução (steps)
+
+Opcionalmente, informe ao PROBAT o plano da automação — passo a passo com descrição. Ao usar o plano, o status de cada step passa a ser obrigatório:
+
+```bash
+# Declara o plano
+./appserver.exe -env=TLPPCORE -run=tlpp.probat.over.setPlan custom:id123456789ext "1:git clone" 2:compile "3:run tests"
+
+# Com medição de tempo: par start + end
+./appserver.exe -env=TLPPCORE -run=tlpp.probat.over.startStep custom:id123456789ext step:1
+./appserver.exe -env=TLPPCORE -run=tlpp.probat.over.endStep   custom:id123456789ext 1:ok
+
+# Sem medição de tempo: somente o status
+./appserver.exe -env=TLPPCORE -run=tlpp.probat.over.setStep   custom:id123456789ext 2:error
+```
+
+O status enviado (`ok`/`error`) é determinante para "quebrar" ou não a pipeline. O par `startStep` + `endStep` registra também o tempo gasto no passo; o `setStep` sozinho abre mão do tempo, mantendo o status.
+
+> Documentação oficial: [11 - Automação com DevOps e CI/CD](https://tdn.totvs.com/pages/viewpage.action?pageId=774903689) e [Enviando eventos da automação para o PROBAT](https://tdn.totvs.com/pages/viewpage.action?pageId=778542566).

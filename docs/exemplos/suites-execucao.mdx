@@ -1,0 +1,126 @@
+---
+title: Suites e execução apartada
+sidebar_label: Suites e execução
+sidebar_position: 8
+displayed_sidebar: restSidebar
+---
+
+import ExemploRef from '@site/src/components/ExemploRef';
+
+# Suites e execução apartada
+
+Recursos do `@TestFixture` que controlam **quando** e **como** cada teste roda: suites nomeadas, exclusão do modo "all", execução sem thread e prioridade.
+
+## Suites
+
+Uma suíte é uma coleção de testes agrupados para execução. Todo teste do PROBAT pertence a uma suíte: sem informar nada, ele entra na suíte **"all"** (default). Para criar uma suíte customizada, basta nomear na propriedade `suite` — agrupe como fizer sentido para o time ("financeiro", "sistemico", "apis de integração"...):
+
+```tlpp
+@TestFixture( suite="minha_suite" )
+function U_test_SUITE_I()
+  assertError( 'esse teste jamais deve ser executado em modo all [test] | command SUITE' )
+return .T.
+```
+
+A vantagem: é possível executar somente uma suíte específica pela função `run`:
+
+```tlpp
+tlpp.probat.run('type:suite','sistemico')
+```
+
+:::info Suítes customizadas ainda rodam no modo "all"
+Por default, mesmo uma suíte customizada é executada quando o PROBAT roda em modo "all". Para tirá-la do "all", é preciso declará-la **exclusiva**.
+:::
+
+### Suítes exclusivas
+
+Declarada com o comando `SUITE ... EXCLUSIVE` em um fonte de configuração compilado no RPO (ver [Configuração](/docs/tlpp/probat/configuracao#suites-exclusivas)), a suíte **sai** do modo "all" e só roda quando chamada explicitamente:
+
+```tlpp
+#include 'tlpp-probat.th'
+
+SUITE sistemico EXCLUSIVE
+```
+
+Caso típico: testes sistêmicos que não devem rodar a cada commit, só no período de testes sistêmicos do produto. Neste repositório, a suíte `bd` (testes de banco) é exclusiva:
+
+```tlpp
+// Executa somente a suite "minha_suite_ok"
+tlpp.probat.runOffCoverage( "type:suite", "minha_suite_ok", "custom:"+cKey )
+```
+
+<ExemploRef repo="probat-samples" file="test_sample_suite.tlpp" path="test/apartness" />
+
+## `runWithAll` / `rwa`
+
+Exclui um teste **individual** do modo "all" sem precisar de suíte (default `.T.`):
+
+```tlpp
+@TestFixture( owner='sample', runWithAll=.F. )
+function U_test_rwa_I()
+  assertError( 'este teste jamais deve ser executado em modo all [test] | property runWithAll' )
+return .T.
+
+// Forma abreviada
+@TestFixture( owner='sample', rwa=.F. )
+function U_test_rwa_II()
+  assertError( 'este teste jamais deve ser executado em modo all [test] | property rwa' )
+return .T.
+```
+
+<ExemploRef repo="probat-samples" file="test_sample_runWithAll.tlpp" path="test/probat_resources" />
+
+## `thread="no"` — execução sem thread
+
+Por default o PROBAT abre uma **thread apartada** (via `StartJob`) para cada teste: se ocorrer um error log, o motor captura o erro e segue executando os demais testes sem interrupção.
+
+Alguns recursos, porém, não funcionam dentro de `StartJob`. Para esses casos, `thread="no"` executa o teste na **mesma thread do motor** — com um risco assumido: se houver um error log que não possa ser capturado, a thread principal cai e **toda a execução do PROBAT é interrompida**.
+
+```tlpp
+// Tem que ser o penultimo a ser executado
+@TestFixture(thread="no")
+function U_test_sample_no_thread()
+
+  local cTest     := 'no_thread'
+  local xValue    := utils.U_echo( cTest )
+  local xExpected := cTest
+
+  tlpp.probat.assertEquals( xValue, xExpected )
+
+return .T.
+```
+
+Justamente para reduzir esse risco, todos os testes com `thread="no"` são executados **ao final** de todos os demais.
+
+:::tip Desligar threads globalmente
+`THREADS_OFF=1` na seção `[PROBAT]` do INI faz o PROBAT ignorar o `thread=` de todos os testes e desabilitar a abertura de threads, sem refatorar fonte algum.
+:::
+
+<ExemploRef repo="probat-samples" file="test_sample_noThread.tlpp" path="test/apartness" />
+
+## `priority` — ordem de execução
+
+Sem prioridade definida, a ordem de execução segue a ordem de retorno das reflections que descobrem os testes no RPO (é também a ordem de gravação na tabela `PROBAT_CONFIG_ROUTINES`). Para controlar a ordem, use `priority`:
+
+- Tipo `numeric`, entre **0 e 999** (até 3 dígitos), sem negativos
+- Default **100**; menor número roda antes
+
+```tlpp
+// Tem que ser o primeiro a ser executado
+@TestFixture(priority=1)
+function U_test_sample_priority_1()
+  // ...
+return .T.
+
+// Tem que ser o ultimo a ser executado
+@TestFixture(priority=999)
+function U_test_sample_priority_999()
+  // ...
+return .T.
+```
+
+Vale lembrar: testes com `thread="no"` vão para o final da fila independentemente da prioridade — não use `thread` para manipular ordem.
+
+<ExemploRef repo="probat-samples" file="test_sample_priority.tlpp" path="test/apartness" />
+
+> Documentação oficial: [e-5 - Suites](https://tdn.totvs.com/display/tec/e-5+-+Suites), [e-2 - Execução em thread](https://tdn.totvs.com/pages/viewpage.action?pageId=577289469) e [e-3 - Ordem e Prioridade](https://tdn.totvs.com/display/tec/e-3+-+Ordem+e+Prioridade).

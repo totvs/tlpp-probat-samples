@@ -1,0 +1,239 @@
+---
+title: Configuração
+sidebar_label: Configuração
+sidebar_position: 2
+displayed_sidebar: restSidebar
+---
+
+import ExemploRef from '@site/src/components/ExemploRef';
+import RepoLink from '@site/src/components/RepoLink';
+
+# Configuração do PROBAT
+
+O PROBAT é configurado em dois níveis: a seção `[PROBAT]` no **INI do AppServer** e a **configuração por código** (comandos declarados em fontes TLPP compilados no RPO — suites exclusivas, cobertura por fonte, cross validation).
+
+## Arquitetura de diretórios
+
+Recomendação oficial: dois subdiretórios na raiz do projeto separando os dois tipos de fonte.
+
+| Diretório | Conteúdo |
+|-----------|----------|
+| `/src/` | **Fontes oficiais** — funções, classes, telas e APIs que vão para o RPO de produção |
+| `/test/` | **Testes** — não devem ser expedidos ao RPO de produção; só existem no ambiente de testes |
+
+Cada módulo criado em `/src/` deve ter o correspondente em `/test/`. Exemplo com um módulo de manipulação de datas:
+
+```text
+C:\my_project\src\date
+C:\my_project\test\date
+```
+
+Não é exigência técnica que os nomes coincidam, mas o espelhamento facilita a manutenção — todos os fontes de uma funcionalidade e todos os seus testes ficam agrupados sob o mesmo nome. Este repositório segue exatamente esse padrão (`src/` e `test/`).
+
+## Encontrando os fontes oficiais
+
+Para recursos como cobertura e cross validation, o PROBAT precisa saber quais são os fontes oficiais do projeto. Há dois modos, controlados por `SOURCE_DISCOVERY_MODE`:
+
+### Modo 0 — Hierarquia de diretórios (recomendado)
+
+O PROBAT varre fisicamente o diretório raiz e encontra todos os arquivos-fonte abaixo dele:
+
+```ini
+[PROBAT]
+SOURCE_DISCOVERY_MODE=0
+SOURCE_PATH=C:/my_project/src/
+```
+
+É o modo mais simples e eficaz quando os fontes seguem a arquitetura de diretórios acima.
+
+### Modo 1 — Annotation `@DiscoverySrc`
+
+Para projetos com fontes espalhados, onde refatorar a localização seria custoso:
+
+```ini
+[PROBAT]
+SOURCE_DISCOVERY_MODE=1
+```
+
+Cada fonte oficial recebe a annotation em qualquer função ou classe, e o PROBAT os encontra via reflection:
+
+```tlpp
+@DiscoverySrc(folder="/my_project/src/date")
+user function myDate()
+```
+
+:::caution Limitações do modo annotation
+- Só funciona com fontes `.tlpp` (annotation e reflection são exclusivos do TLPP) — fontes **AdvPL não são encontrados** nesse modo
+- Exige refatorar todos os fontes oficiais para inserir o `@DiscoverySrc()`
+- O projeto precisa ser recompilado
+:::
+
+Em ambos os modos, os fontes descobertos são gravados na tabela `PROBAT_CONFIG_SOURCES` do SQLite (colunas `CODE`, `FOLDER`, `SOURCE`, `NAMESPACE`).
+
+## Seção `[PROBAT]` no INI
+
+Exemplo real usado neste repositório (<RepoLink id="probat-samples" path="ini">pasta `ini/`</RepoLink>):
+
+```ini
+[PROBAT]
+DEVTLPP=0
+LOG_VERBOSE=0
+LOG_INFO=1
+LOG_WARN=1
+LOG_ERROR=1
+LOG_DEBUG=1
+THREADS_MEMORY=1
+SOURCE_DISCOVERY_MODE=0
+SOURCE_PATH=/opt/totvs/tlpp-probat-samples/src
+TESTS_DISCOVERY_MODE=0
+TESTS_DISCOVERY_TIME_INTERVAL=10
+CROSS_VALIDATION=U_ListFunctionCross
+CODECOVERAGE=1
+CODECOVERAGE_EXPORT_JSON=1
+CODECOVERAGE_PERCENT=90
+CODECOVERAGE_EXPORT_XML=1
+EXPORT_ID_TEST_NAME=1
+EXPORT_FILE_NAME=probat_results
+EXPORT_AFTER_RUN=1
+EXPORT_FORMAT=JUnit
+REST=localhost
+ShutDown=0
+```
+
+O repositório traz três INIs: `appserver.ini` (subida normal), `appserver_sh.ini` e `appserver_sh_external.ini` (usados pelos scripts de automação — ver [Automação](/docs/tlpp/probat/automacao-scripts)).
+
+### Referência de chaves
+
+#### Gerais
+
+| Chave | Valores | Função |
+|-------|---------|--------|
+| `DEVTLPP` | `0` | **Sempre 0** — o valor `1` é de uso exclusivo da equipe do tlppCore e pode causar comportamentos inesperados |
+| `ShutDown` | `0`/`1` | Com `1`, o AppServer é finalizado automaticamente ao fim dos testes (útil em esteiras) |
+| `THREADS_MEMORY` | `0`/`1` | Com `1`, a coleta de memória de início/fim é feita por thread; com `0`, sempre do AppServer |
+| `THREADS_OFF` | `0`/`1` | Com `1`, ignora `thread=` de todos os testes e desliga a abertura de threads globalmente |
+
+#### Logs
+
+| Chave | Função |
+|-------|--------|
+| `LOG_VERBOSE` | Modo verboso — adiciona contexto além da mensagem original |
+| `LOG_INFO` | Informações básicas do PROBAT |
+| `LOG_WARN` | Avisos |
+| `LOG_DEBUG` | Detalhes das execuções |
+| `LOG_ERROR` | Erros |
+| `LOG_USER_*` | Mesmos níveis, para os logs de usuário (`log_user_info` etc. — TLPP 01.03.04+, default `1`) |
+
+Todas aceitam `0` (desligado) ou `1` (ligado).
+
+#### Fontes e testes
+
+| Chave | Função |
+|-------|--------|
+| `SOURCE_DISCOVERY_MODE` | `0` = hierarquia de diretórios, `1` = annotation (ver acima) |
+| `SOURCE_PATH` | Diretório raiz dos fontes oficiais (modo 0) |
+| `SOURCE_SKIPPED_PATH` | Subdiretórios ignorados na busca, separados por vírgula |
+| `TESTS_DISCOVERY_MODE` | `0` = descoberta por solicitação, `1` = a cada execução — ver [Execução e resultados](/docs/tlpp/probat/execucao-resultados#discovery--encontrando-os-testes-no-rpo) |
+| `TESTS_DISCOVERY_TIME_INTERVAL` | Intervalo em **segundos** entre buscas de testes no RPO (modo 1) |
+
+#### Cobertura de código
+
+| Chave | Função |
+|-------|--------|
+| `CODECOVERAGE` | Liga (`1`) / desliga (`0`) a captação de cobertura — ver [Cobertura](/docs/tlpp/probat/cobertura) |
+| `CODECOVERAGE_PERCENT` | Percentual mínimo aceito (0–100; `0` desativa a validação) |
+| `CODECOVERAGE_EXPORT_JSON` | Exporta cobertura em JSON (usado pela extensão do VSCode) |
+| `CODECOVERAGE_EXPORT_TFS` | Exporta cobertura em XML no formato COBERTURA (o INI deste repositório usa a variante `CODECOVERAGE_EXPORT_XML`) |
+| `CODECOVERAGE_FILTER_SRC` | Restringe a validação a subdiretórios específicos, separados por vírgula |
+
+#### Exportação de resultados
+
+| Chave | Função |
+|-------|--------|
+| `EXPORT_AFTER_RUN` | `1` gera o arquivo de resultados automaticamente ao fim da execução |
+| `EXPORT_FILE_NAME` | Nome do arquivo de exportação |
+| `EXPORT_FORMAT` | Formato do resultado — atualmente `JUnit` |
+
+Detalhes e padrões de nomes em [Execução e resultados](/docs/tlpp/probat/execucao-resultados#exportando-resultados).
+
+#### Validações adicionais
+
+| Chave | Função |
+|-------|--------|
+| `CROSS_VALIDATION` | Função de usuário que retorna a lista de "alvos" da validação cruzada (vazio = desativada) |
+| `BLOCKED_WORDS` | Palavras proibidas nas descrições dos testes, separadas por vírgula (vazio = desativada) |
+
+#### Banco de dados dos resultados
+
+| Chave | Função |
+|-------|--------|
+| `dbType` | `Local` (SQLite, default), `Env` (DBAccess do environment) ou `DBAccess` (conexão exclusiva) |
+| `DBDATABASE` / `DBSERVER` / `DBALIAS` / `DBPORT` | Conexão DBAccess exclusiva quando `dbType=DBAccess` |
+
+Ver [Execução e resultados](/docs/tlpp/probat/execucao-resultados#onde-os-resultados-são-gravados).
+
+> Documentação oficial: [3 - Configurando](https://tdn.totvs.com/display/tec/3+-+Configurando) e [3c - INI](https://tdn.totvs.com/display/tec/c+-+INI).
+
+## Configuração por código
+
+Alguns comportamentos são declarados por **comandos** em fontes TLPP compilados no RPO. A sugestão oficial é concentrá-los em um fonte só de configuração — aqui, o `test/config/test_config.tlpp`.
+
+### Suites exclusivas
+
+Suites marcadas como `EXCLUSIVE` **não** rodam no modo "all" — só quando executadas explicitamente:
+
+```tlpp
+#include 'tlpp-probat.th'
+
+SUITE minha_suite     EXCLUSIVE
+SUITE minha_suite_ok  EXCLUSIVE
+SUITE bd              EXCLUSIVE
+```
+
+<ExemploRef repo="probat-samples" file="test_config.tlpp" path="test/config" />
+
+### Cobertura mínima por fonte
+
+Sobrescreve o `CODECOVERAGE_PERCENT` global para um fonte específico (o namespace, quando informado, vai entre aspas):
+
+```tlpp
+COVERAGE PERCENTAGE 85 NAMESPACE "coverage" SOURCE sample_coverage TYPE tlpp
+COVERAGE PERCENTAGE 20 SOURCE formulas TYPE prw
+```
+
+### Validação cruzada (cross validation)
+
+A função apontada em `CROSS_VALIDATION` no INI devolve a lista de "alvos" que **obrigatoriamente** precisam ter ao menos um teste. A lista pode representar o que a equipe quiser: fontes, funções, classes, módulos, recursos…
+
+Critérios da função: retornar um array simples de strings com pelo menos 1 elemento, e estar compilada no ambiente onde o PROBAT executa.
+
+```tlpp
+function U_ListFunctionCross()
+
+  local aRet := {}
+
+  aadd( aRet, 'sample_sum_parameters.prw' )
+  aadd( aRet, 'sample_ok.tlpp' )
+  aadd( aRet, 'sample_error.tlpp' )
+
+return aRet
+```
+
+Cada teste é amarrado ao seu alvo pela propriedade `target` do `@TestFixture`:
+
+```tlpp
+@TestFixture(target="sample_ok.tlpp")
+function U_test_sample_function()
+```
+
+Se algum alvo da lista ficar sem teste, o PROBAT registra erro na apuração dos resultados:
+
+```xml
+<testcase id="2" name="Element:item.2" time="0.001" description="" >
+  <failure type="Warning" message="validation error">
+    [ER0003] item.2: there is no test developed for this element in cross-validation
+  </failure>
+</testcase>
+```
+
+<ExemploRef repo="probat-samples" file="cross_list.tlpp" path="test/config" />

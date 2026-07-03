@@ -1,0 +1,136 @@
+---
+title: Annotations
+sidebar_label: Annotations
+sidebar_position: 3
+displayed_sidebar: restSidebar
+---
+
+import ExemploRef from '@site/src/components/ExemploRef';
+
+# Annotations do PROBAT
+
+O PROBAT localiza os testes no RPO via **reflection**, procurando classes e funções marcadas com annotations. Todo teste começa com `#include "tlpp-probat.th"` (onde as annotations, comandos e instruções do PROBAT são definidos) e a annotation `@TestFixture` sobre uma **função** ou **classe**.
+
+## `@TestFixture`
+
+Marca o alvo como dispositivo de teste — só através dessa marcação o PROBAT descobre o que executar. Aceita propriedades que controlam identificação e execução:
+
+```tlpp
+@TestFixture(owner='sample', target="sample_ok.tlpp")
+function U_test_sample_function()
+  // ...
+return .T.
+```
+
+| Propriedade | Tipo / default | Efeito |
+|-------------|----------------|--------|
+| `suite` | character / `"all"` | Suite à qual o teste pertence — ver [Suites e execução](/docs/tlpp/probat/suites-execucao) |
+| `owner` | character / `"unknown"` | Dono/time do teste (registrado no banco para futuros filtros e agrupamentos) |
+| `thread` | character / `"yes"` | `"no"` executa o teste na mesma thread do motor, por último |
+| `priority` | numeric / `100` | Ordem de execução — menor roda antes (0 a 999, sem negativos) |
+| `folder` | character / `""` | Diretório físico do teste; normalmente detectado automaticamente pelo namespace |
+| `test` | character / `""` | Nome do teste; por default é extraído do nome da classe/função (`test_LOGS` → `LOGS`) |
+| `description` | character / `""` | Descrição livre do teste |
+| `target` | character / `""` | "Alvo" do teste para o cross validation — ver [Configuração](/docs/tlpp/probat/configuracao#validação-cruzada-cross-validation) |
+| `runWithAll` / `rwa` | logical / `.T.` | `.F.` exclui o teste do modo "all" |
+
+:::tip Forma não nomeada
+`suite` é a primeira propriedade da annotation, então pode ser passada sem nome: `@TestFixture("minha_suite")` equivale a `@TestFixture(suite="minha_suite")`. As demais propriedades precisam ser sempre nomeadas.
+:::
+
+> Documentação oficial: [e-1 - A Annotation TestFixture](https://tdn.totvs.com/display/tec/e-1+-+A+Annotation+TestFixture).
+
+<ExemploRef repo="probat-samples" file="test_sample_runWithAll.tlpp" path="test/probat_resources" />
+
+## `@Test` — métodos de classe
+
+Em testes escritos como classe, cada método de teste recebe `@Test('descrição')`. A **descrição é obrigatória** — ela passa por validação (inclusive contra as `BLOCKED_WORDS` do INI):
+
+```tlpp
+@TestFixture(owner='sample', target="sample_ok.tlpp")
+class test_sample_class
+
+  public method new() constructor
+
+  @Test('aqui deve-se colocar o descritivo sobre o teste')
+  public method test_sampleOK()
+
+endclass
+```
+
+O `@Test` também aceita a propriedade `folder`, que tem prioridade sobre a detecção automática: `@Test('descrição', folder='test/unit/sample')`.
+
+:::caution Classe sem @Test
+Uma classe marcada com `@TestFixture` mas sem nenhum método `@Test` começa a executar, porém gera resultado **SKIPPED**.
+:::
+
+## Setups e TearDowns (ciclo de vida)
+
+Disponíveis em testes de classe — úteis para preparar e desmontar cenário (conexão, tabelas, massa de dados):
+
+| Annotation | Quando roda |
+|------------|-------------|
+| `@OneTimeSetUp()` | Uma vez, antes de todos os testes da classe |
+| `@Setup()` | Antes de **cada** teste |
+| `@TearDown()` | Depois de **cada** teste |
+| `@OneTimeTearDown()` | Uma vez, ao final de todos os testes |
+
+Não há limite de métodos marcados — todos os anotados serão executados. O fluxo completo é:
+
+1. Instancia o objeto da classe (`new`)
+2. `@OneTimeSetUp` *(opcional)*
+3. `@Setup` *(opcional)*
+4. `@Test`
+5. `@TearDown` *(opcional)*
+6. `@OneTimeTearDown` *(opcional)*
+
+Havendo mais de um `@Test`, os passos 3–5 formam um loop: `setup → test → tearDown` para cada método de teste. Saída de console de uma classe com dois testes:
+
+```text
+-> [constructor] Method: NEW
+  -> [OneTimeSetUp] Method: SETONE_1
+  -> [OneTimeSetUp] Method: SETONE_2
+    -> [SetUp] Method: SETALL
+       -> [Test] Method: FIRSTEXAMPLEMETHOD
+    -> [TearDown] Method: DOWNALL
+    -> [SetUp] Method: SETALL
+       -> [Test] Method: SECONDEXAMPLEMETHOD
+    -> [TearDown] Method: DOWNALL
+  -> [OneTimeTearDown] Method: DOWNONE
+```
+
+```tlpp
+@TestFixture( suite="bd" )
+class test_db
+
+  @OneTimeSetUp()
+  public method setConn()
+
+  @Setup()
+  public method setTable()
+
+  @Test('test method for DB update')
+  public method test01_update()
+
+  @TearDown()
+  public method clearTable()
+
+  @OneTimeTearDown()
+  public method closeConn()
+
+endclass
+```
+
+Exemplo completo em [Integração com banco de dados](/docs/tlpp/probat/integracao-bd).
+
+## Outras annotations
+
+- `@Skip()` — pula o teste, com filtros opcionais por SO, versão, banco ou função customizada — ver [Pulando testes](/docs/tlpp/probat/pulando-testes)
+- `@ErrorLog('trecho')` — declara que o teste **deve** gerar um error log com o trecho informado — ver [Error Log](/docs/tlpp/probat/error-log)
+- `@DiscoverySrc(folder="...")` — marca fontes **oficiais** (não testes) para descoberta por annotation — ver [Configuração](/docs/tlpp/probat/configuracao#modo-1--annotation-discoverysrc)
+
+## Boas práticas de estrutura
+
+- Use **namespaces** espelhando o diretório do teste (`namespace test.unit.sample` para `test/unit/sample`) — o PROBAT extrai o `FOLDER` automaticamente daí, tanto na gravação do banco quanto no XML exportado
+- `#include "tlpp-probat.th"` é obrigatório em todo teste; `#include "tlpp-core.th"` só quando o teste usa classe
+- Importe o namespace dos asserts com `using namespace tlpp.probat` (ou prefixe cada chamada com `tlpp.probat.`)

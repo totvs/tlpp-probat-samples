@@ -1,0 +1,125 @@
+---
+title: Cobertura de código
+sidebar_label: Cobertura
+sidebar_position: 9
+displayed_sidebar: restSidebar
+---
+
+import ExemploRef from '@site/src/components/ExemploRef';
+
+# Cobertura de código
+
+Resultados de testes dizem se as funcionalidades estão corretas — mas não dizem se os testes **percorrem todas as linhas** do projeto. Caminhos alternativos e inesperados estão sendo exercitados? Há trechos inalcançáveis? A cobertura de código responde essas perguntas com métricas claras de percentual e com a visão linha a linha de cada fonte.
+
+A captação da informação em tempo de execução é responsabilidade do **AppServer**; ao PROBAT cabe acionar essa captação, quantificar, registrar, validar e exportar os resultados.
+
+## Ligando a cobertura
+
+No INI (ver [Configuração](/docs/tlpp/probat/configuracao)):
+
+```ini
+[PROBAT]
+CODECOVERAGE=1
+CODECOVERAGE_PERCENT=90
+CODECOVERAGE_EXPORT_JSON=1
+CODECOVERAGE_EXPORT_TFS=1
+SOURCE_PATH=/opt/totvs/tlpp-probat-samples/src
+```
+
+| Chave | Efeito |
+|-------|--------|
+| `CODECOVERAGE=1` | Liga a captação e o registro dos resultados nas tabelas do SQLite |
+| `CODECOVERAGE_PERCENT` | Percentual mínimo exigido (0–100; `0` desativa a validação) |
+| `CODECOVERAGE_EXPORT_JSON=1` | Exporta JSON (consumido pela extensão do VSCode) |
+| `CODECOVERAGE_EXPORT_TFS=1` | Exporta XML no formato [COBERTURA](https://cobertura.github.io/cobertura/) — reconhecido pelas ferramentas de CI/CD |
+| `SOURCE_PATH` | Define os fontes oficiais que entram no cálculo |
+
+Também é possível ligar/desligar a cobertura **em tempo de execução**, com prioridade sobre o INI — ver [Execução e resultados](/docs/tlpp/probat/execucao-resultados#ligando-a-cobertura-na-execução).
+
+## Validando o percentual mínimo
+
+Com `CODECOVERAGE_PERCENT` acima de zero, o PROBAT valida a cobertura ao final: se algum fonte ficar abaixo do mínimo, é gerado **erro** e o resultado dos testes é invalidado. Dois recursos refinam essa validação:
+
+### Percentual por fonte
+
+Quando um fonte específico tem meta diferente da global, declare em um fonte de configuração compilado no RPO (o namespace, quando informado, vai entre aspas):
+
+```tlpp
+COVERAGE PERCENTAGE 85 NAMESPACE "coverage" SOURCE sample_coverage TYPE tlpp
+COVERAGE PERCENTAGE 20 SOURCE formulas TYPE prw
+```
+
+### Filtro por módulos
+
+Em projetos grandes há módulos maduros e módulos em amadurecimento — não faz sentido quebrar a expedição inteira por um módulo que ainda não atingiu a meta. O filtro restringe a validação a diretórios específicos:
+
+```ini
+[PROBAT]
+CODECOVERAGE=1
+CODECOVERAGE_FILTER_SRC=pasta_1,pasta_2,pasta_3
+```
+
+## Onde os dados ficam
+
+Os resultados da **última execução** com cobertura são persistidos em três tabelas do SQLite, com três níveis de detalhe:
+
+| Tabela | Visão |
+|--------|-------|
+| `PROBAT_CODECOVERAGE_TOTAL` | **Sintética** — percentuais totais: geral, só fontes oficiais (`COVERAGE_FRAME`) e só fontes de teste (`COVERAGE_TEST`) |
+| `PROBAT_CODECOVERAGE_SOURCES` | **Por fonte** — percentual e total de linhas de cada fonte, com flag `RUN` indicando se foi executado |
+| `PROBAT_CODECOVERAGE_LINES` | **Analítica** — linha a linha: `-1` = linha não debugável, `0` = não executou, `>0` = quantidade de execuções |
+
+Com a visão analítica dá para melhorar fontes e testes, e descobrir implementações desnecessárias ou inalcançáveis.
+
+## Visualizando no VSCode
+
+A extensão do PROBAT para VSCode decora o fonte aberto com a cobertura obtida, a partir do arquivo **JSON** exportado (`CODECOVERAGE_EXPORT_JSON=1`):
+
+1. Instale a extensão (arquivo `.vsix` disponível nos [materiais de apoio do TDN](https://tdn.totvs.com/display/tec/PROBAT+-+Materiais+de+apoio))
+2. Nas configurações do workspace, seção **PROBAT**, informe em **Coverage: File** o caminho do JSON gerado
+3. Abra o fonte e execute o comando **PROBAT - Show Code Coverage** (`Ctrl+Shift+P`)
+
+Linhas cobertas ficam **verdes**, não cobertas **vermelhas**, e linhas não debugáveis não recebem decoração. Na versão atual o recurso é local — VSCode e AppServer precisam estar na mesma máquina.
+
+## Exemplo didático
+
+O teste abaixo cobre o fonte `src/coverage/sample_coverage.tlpp` — um `do case` com 7 saídas. Os casos extras estão **propositalmente comentados** para a cobertura ficar abaixo de 100% e você visualizar o efeito no relatório:
+
+```tlpp
+#include 'tlpp-core.th'
+#include 'tlpp-probat.th'
+
+namespace  test.coverage
+
+using namespace tlpp.probat
+
+@TestFixture()
+function U_testCoverage()
+
+  local xValue
+  local xExpected
+
+  xValue    := coverage.U_srcCoverage( 1 )
+  xExpected := 'Aa'
+    assertEquals( xValue, xExpected )
+
+  xValue    := coverage.U_srcCoverage( 2 )
+  xExpected := 'Ee'
+    assertEquals( xValue, xExpected )
+
+  // ... casos 3, 4 e 5 ...
+
+  // Comentado propositadamente para causar % menor de cobertura
+
+  // xValue    := coverage.U_srcCoverage( 0 )
+  // xExpected := ''
+  //   assertEquals( xValue, xExpected )
+
+return .T.
+```
+
+A propriedade `target` do `@TestFixture` também alimenta a relação teste ↔ fonte — ver [Annotations](/docs/tlpp/probat/annotations).
+
+> Documentação oficial: [e-6 - Cobertura de Código](https://tdn.totvs.com/pages/viewpage.action?pageId=577289473).
+
+<ExemploRef repo="probat-samples" file="test_coverage.tlpp" path="test/coverage" />

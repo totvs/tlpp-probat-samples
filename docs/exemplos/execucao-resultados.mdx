@@ -1,0 +1,186 @@
+---
+title: Execução e resultados
+sidebar_label: Execução e resultados
+sidebar_position: 10
+displayed_sidebar: restSidebar
+---
+
+import ExemploRef from '@site/src/components/ExemploRef';
+
+# Execução e resultados
+
+Como o PROBAT **encontra** os testes no RPO, os **modos de execução** da `run()`, onde os resultados são **gravados** e como **exportá-los** para ferramentas de CI/CD.
+
+## Discovery — encontrando os testes no RPO
+
+Antes de executar, o PROBAT precisa descobrir os testes compilados. A chave `TESTS_DISCOVERY_MODE` do INI define quando isso acontece:
+
+| Modo | Comportamento | Prós | Contras |
+|------|---------------|------|---------|
+| `0` — Por solicitação | Descobre só quando pedido | Execuções mais rápidas | Precisa solicitar a descoberta a cada novo fonte de teste compilado |
+| `1` — Na execução | Descobre antes de cada `run()` | Sempre encontra fontes recém-compilados | Em RPOs grandes pode haver lentidão a cada execução |
+
+No modo `0`, solicite a descoberta na primeira execução e sempre que compilar novos testes — sem isso, o PROBAT **nem sabe** que os testes existem:
+
+```tlpp
+// Main Function — retorna .T./.F.
+tlpp.probat.discovery()
+```
+
+```text
+// ou via API REST
+GET /tlpp/probat/discovery
+→ { "sucess": yes|no, "message": "" }
+```
+
+No modo `1`, a chave `TESTS_DISCOVERY_TIME_INTERVAL` (em segundos) evita descobertas repetidas: execuções dentro do intervalo reaproveitam a última descoberta — com o risco de "perder" um fonte compilado nesse meio-tempo.
+
+## `tlpp.probat.run()` — modos de execução
+
+A `run()` é uma **Main Function** — pode ser chamada por código, pela execução do VSCode (`Ctrl+F5` → `tlpp.probat.run`) ou por linha de comando:
+
+```bash
+# Windows
+appserver.exe -run=tlpp.probat.run -env=NOME_AMBIENTE
+
+# Linux
+./appsrvlinux -run=tlpp.probat.run -env=NOME_AMBIENTE
+```
+
+Ela retorna o **código de execução** (character), usado depois para exportar resultados. Os parâmetros controlam o recorte:
+
+| Modo | Chamada |
+|------|---------|
+| Todos os testes | `tlpp.probat.run()` ou `tlpp.probat.run('type:all')` |
+| Por namespace | `tlpp.probat.run('type:namespace','date','math')` |
+| Por código-fonte | `tlpp.probat.run('type:source','test_maximum.tlpp')` |
+| Somente testes com erro | `tlpp.probat.run('type:error')` ou `('type:fail')` |
+| Por suíte | `tlpp.probat.run('type:suite','sistemico')` |
+
+Observações:
+
+- Nos modos por namespace e por fonte, informe quantos valores precisar (`'type:source','a.tlpp','b.tlpp'`)
+- O modo `type:error` reexecuta apenas os testes que falharam — exige uma execução anterior em modo "all" com erros no histórico
+- Suítes **exclusivas** só rodam via `type:suite` — ver [Suites e execução](/docs/tlpp/probat/suites-execucao#suítes-exclusivas)
+
+### Ligando a cobertura na execução
+
+Independentemente do INI, a cobertura pode ser ligada/desligada em runtime — e o parâmetro **tem prioridade** sobre a chave `CODECOVERAGE`:
+
+```tlpp
+// Ligar
+tlpp.probat.runOnCoverage()
+tlpp.probat.run(.T.)
+tlpp.probat.run('coverage:on')
+
+// Desligar
+tlpp.probat.runOffCoverage()
+tlpp.probat.run(.F.)
+tlpp.probat.run('coverage:off')
+```
+
+### Identificador customizado
+
+O parâmetro `custom:` grava um identificador seu (até 255 caracteres) no campo `CUSTOM` da tabela `PROBAT_TEST_EXECUTION`:
+
+```tlpp
+tlpp.probat.run('custom:123456789')
+// ou
+tlpp.probat.run('param:123456789')
+```
+
+É a chave para **agrupar execuções distintas** (unitários, integrados, funcionais rodados em momentos diferentes) em uma única exportação — e para amarrar eventos externos de automação à execução real (ver [Automação](/docs/tlpp/probat/automacao-scripts)).
+
+## Onde os resultados são gravados
+
+O PROBAT persiste **todas** as execuções em banco relacional, permitindo análise retroativa. Três modos, pela chave `dbType`:
+
+| Modo | INI | Comportamento |
+|------|-----|---------------|
+| SQLite local (default) | `dbType=Local` | Cria `SYSTEM.db` na pasta `db_sys` automaticamente, sem configuração |
+| DBAccess do environment | `dbType=Env` | Usa a conexão DBAccess já configurada no environment |
+| DBAccess exclusivo | `dbType=DBAccess` + `DBDATABASE`, `DBSERVER`, `DBALIAS`, `DBPORT` | Conexão dedicada ao PROBAT |
+
+:::info Disponibilidade
+Gravação via DBAccess a partir do **AppServer 20.3.1.14** e **tlppCore 01.04.05** — versões anteriores gravam somente em SQLite.
+:::
+
+### Principais tabelas
+
+| Tabela | Conteúdo |
+|--------|----------|
+| `PROBAT_TEST_EXECUTION` | Dados de cada execução (data, hora, tipo, parâmetros, identificador customizado) |
+| `PROBAT_TEST_RESULTS` | Totais por execução: testes OK, com erro e pulados |
+| `PROBAT_TEST_TESTS` | Um registro por assert: fonte, classe/método, valores esperado × obtido, tempo |
+| `PROBAT_TEST_ERRORS` | Mensagens de erro capturadas |
+| `PROBAT_TEST_WARNING` | Avisos gerados por `assertWarning()` |
+| `PROBAT_CODECOVERAGE_*` | Cobertura de código — ver [Cobertura](/docs/tlpp/probat/cobertura#onde-os-dados-ficam) |
+
+## Exportando resultados
+
+### Automática, ao fim da execução
+
+```ini
+[PROBAT]
+EXPORT_AFTER_RUN=1
+EXPORT_FILE_NAME=results
+EXPORT_FORMAT=JUnit
+```
+
+Com `EXPORT_AFTER_RUN=1`, o arquivo é gerado na pasta `ROOT/SYSTEM` do AppServer ao final da execução, contendo **somente a última execução**. O formato implementado atualmente é o **JUnit** — aceito por Jenkins, GitLab CI, GitHub Actions, Azure DevOps etc.:
+
+```xml
+<?xml version="1.0"?>
+  <testsuites id="20190109203113" name="results" type="all" tests="1" skipped="0" failures="0" time="0.002" >
+    <testsuite id="000001" name="all" tests="1" skipped="0" failures="0" time="0.002" >
+      <testcase id="1" name="Class:MANUALUT.TEST_MANUALUT():New() | Method:EXAMPLEFORUSE()" time="0.002" >
+        Folder: TEST/UNIT/MANUALUT | Call: U_manualUT( cTest ) | Expected: {C}-[test_1] | Result: {C}-[test_1]
+      </testcase>
+    </testsuite>
+  </testsuites>
+```
+
+Dica para os nomes de arquivo: usar `*` no `EXPORT_FILE_NAME` prefixa/sufixa os arquivos gerados e evita conflito entre resultado e cobertura — `*customname` gera `unit-customname.xml`, `coverage-customname.json` e `coverage-customname.xml`.
+
+### Sob demanda — `tlpp.probat.export()`
+
+Exporta quando quiser, buscando execuções por **código** (retorno da `run()`) ou por **identificador customizado**:
+
+```tlpp
+tlpp.probat.export( "type:code", "20211217155201" )
+
+// ou
+
+tlpp.probat.export( "type:custom", "Hgk34Gnm90" )
+```
+
+Pode-se enviar mais de um código para **unificar** várias execuções em um único resultado — é assim que o `main.prw` deste repositório junta a suíte exclusiva e o modo "all" numa exportação só (ver [Automação](/docs/tlpp/probat/automacao-scripts#execução-por-código--mainprw)).
+
+### Warnings
+
+Havendo avisos registrados por `assertWarning()`, a exportação gera um XML apartado, `{nome_arquivo}_warning.xml`:
+
+```xml
+<?xml version="1.0"?>
+<warnings name="tlppCore_tests_warning" date="12/17/21" time="13:52:01" >
+  <exec code="20211217135200" >
+    <warning id="1" call_source="TEST_SAMPLE_ASSERTS.TLPP" call_line="30" >
+      Desc: Gera mensagem de aviso, mas nao gera resultados nem positivo, nem negativo
+    </warning>
+  </exec>
+</warnings>
+```
+
+## Interface gráfica (GUI)
+
+A partir do tlppCore **01.04.02** / AppServer **20.3.1.10**, o PROBAT tem uma GUI nativa:
+
+```tlpp
+tlpp.probat.gui()
+```
+
+Pela tela principal é possível ver as versões dos softwares, o histórico sintético de execuções (verde = sem erros/avisos, laranja = há avisos, vermelho = há erros) e disparar execuções com filtros por fonte, suíte ou namespace. Um duplo clique em uma execução abre os dados analíticos de cada teste (tempo, memória, resultado), e há um botão para visualizar o XML JUnit gerado.
+
+> Documentação oficial: [6 - Executando Testes](https://tdn.totvs.com/display/tec/6+-+Executando+Testes) e [7 - Resultados Testes](https://tdn.totvs.com/display/tec/7+-+Resultados+Testes).
+
+<ExemploRef repo="probat-samples" file="main.prw" path="run" />

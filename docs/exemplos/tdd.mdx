@@ -1,0 +1,68 @@
+---
+title: TDD
+sidebar_label: TDD
+sidebar_position: 13
+displayed_sidebar: restSidebar
+---
+
+import ExemploRef from '@site/src/components/ExemploRef';
+
+# TDD — Test-driven development
+
+O PROBAT viabiliza o fluxo clássico do TDD em TLPP: **escreva o teste antes**, veja falhar, implemente o mínimo para passar, refatore.
+
+## O fluxo no repositório
+
+Os fontes `test/tdd/tdd_sample_1.tlpp` e `tdd_sample_2.tlpp` foram escritos **antes** da implementação de `src/tdd/tdd_sample.tlpp`. O comentário deixado no teste conta a história:
+
+```tlpp
+#include 'tlpp-core.th'
+#include 'tlpp-probat.th'
+
+namespace  test.tdd
+
+using namespace tlpp.probat
+
+@TestFixture()
+// @skip() // o Skip nesse exemplo foi necessario antes da implementacao de: src/tdd/tdd_sample.tlpp
+function U_test_tdd_sample_1()
+
+  local xValue
+  local xExpected
+
+  xValue    := tdd.U_sumNum( 1,2 )
+  xExpected := 3
+    assertEquals( xValue, xExpected )
+
+  xValue    := tdd.U_sumNum( 10,20 )
+  xExpected := 30
+    assertEquals( xValue, xExpected )
+
+return .T.
+```
+
+Enquanto `tdd.U_sumNum` não existia, o teste ficava com `@Skip()`. Implementada a função, o skip foi removido e o teste passou a valer.
+
+## A implementação mínima
+
+```tlpp
+namespace tdd
+
+function U_sumNum( nP1 as numeric, nP2 as numeric ) as numeric
+
+  local nSum  := 0 as numeric
+
+  if ( valtype(nP1)=='N' .and. valtype(nP2)=='N' )
+    nSum := (nP1 + nP2)
+  endif
+
+return nSum
+```
+
+## Dicas para TDD com PROBAT
+
+1. Use `@Skip()` nos testes cuja implementação ainda não existe — eles ficam visíveis no plano sem quebrar a esteira
+2. Mantenha a relação teste ↔ fonte com a propriedade `target` do `@TestFixture` (ver [Annotations](/docs/tlpp/probat/annotations))
+3. Combine com a [cobertura de código](/docs/tlpp/probat/cobertura) para confirmar que a implementação nova está de fato coberta
+
+<ExemploRef repo="probat-samples" file="tdd_sample_1.tlpp" path="test/tdd" />
