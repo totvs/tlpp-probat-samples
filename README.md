@@ -1,64 +1,24 @@
-# PROBAT - test engine
+# tlpp-probat-samples
 
-> [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)<br>Esta é uma iniciativa open source, sob **Licença MIT**, e como tal, é disponibilizada **sem qualquer garantia, expressa ou implícita**, não havendo restrições sobre usar, copiar, modificar, fundir, publicar, distribuir, sublicenciar e/ou vender cópias de seu conteúdo.
+Exemplos de uso da engine de testes **PROBAT** do tlppCore — asserts, suites, cobertura, testes de API REST, integração com banco e automação.
 
-> Esse projeto no GitHub contempla somente exemplos de uso das funcionalidades do **PROBAT**.
+Os fontes em `src/` simulam o código da aplicação; os testes em `test/` usam a sintaxe PROBAT.
 
-### O que é o PROBAT?
+## Estrutura do repositório
 
-É um conjunto de ferramentas e funcionalidades nativas do tlppCore para auxiliar os DEVS e equipes no processo de desenvolvimento de software através da criação e execução de testes em programas TLPP ou AdvPL.
+| Pasta | Conteúdo |
+|-------|----------|
+| `src/` | Código de exemplo a ser testado (TLPP, AdvPL, API, TDD) |
+| `test/probat_resources/` | Asserts, skip, error log e recursos básicos |
+| `test/apartness/` | Execução apartada — suite, thread, prioridade |
+| `test/api/` | Testes de API REST |
+| `test/integration/` | Integração com banco de dados |
+| `test/unit/`, `test/tdd/`, `test/coverage/` | Unitários, TDD e cobertura |
+| `run/` | Scripts para executar o PROBAT de forma automatizada |
+| `ini/` | Configurações do AppServer para os exemplos |
 
-### Para que serve?
+## Documentação
 
-Melhorar a qualidade do código-fonte em seu projeto de software, possibilitando: 
+Conceitos, trilha de leitura e mapa dos exemplos:
 
-* Criação e execução de **Testes Unitários**, **Funcionais** e **Integrados**.
-
-* Com a análise de **Resultados** é possível verificar se seu software está cumprindo suas funcionalidades projetadas.
-
-* Através da **Cobertura de Código** é possível verificar se seu plano de testes de fato executa todo o seu código.
-
-* Possibilita o desenvolvimento com **TDD** (Test-driven development).
-
-* Com a utilização de práticas de **DevOps** é possível **Automatizar** a esteira de testes e geração de artefatos.
-
-* Fácil integração com conhecidas ferramentas de **CI/CD**.
-
-* Aprimorar a área de **QA** (Quality Assurance) em seu projeto.
-
-
-> #### Importante!
-> 
-> 1 - Para melhor entendimento desse projeto, recomendamos fortemente a leitura de sua documentação técnica em: [tdn.totvs.com/display/tec/PROBAT](https://tdn.totvs.com/display/tec/PROBAT)<br>
-> 2 - Recomendamos também assistir ao vídeo [Iniciando no PROBAT](https://www.youtube.com/watch?v=covZWUvXwRA) em nosso canal do Youtube.
-
-### Estrutura do Projeto
-
-O projeto possui a seguinte estrutura de diretórios:<br>
-.<br>
-..<br>
-├── ini<br>
-├── run<br>
-├── src<br>
-└── test<br>
-
-#### [ /ini ]
-
-Na pasta INI temos dois arquivos .ini com configurações do AppServer, um para a subida normal do server e outros dois para serem utilizados pelo script.
-
-Dentro deles há a configuração do **PROBAT** utilizada.
-#### [ /run ]
-
-Na pasta RUN temos todos os scripts necessários para executar o **PROBAT** de forma automatizada.
-
-Os detalhes de como utilizá-los estão em: [Como usar os scripts](scripts.MD)
-
-Além disso, existe o fonte [*main.prw*] mostrando uma outra forma de encadear as execuções, na qual a descoberta dos fontes de testes são apartadas da execução, fazemos uma execução da suite exclusiva e depois a execução de todos os testes. Ao final solicitamos a exportação dos resultados gerados.
-
-#### [ /src ]
-
-Na pasta SRC temos os fontes com a implementação de funcionalidades que serão testadas, fazendo um paralelo à sua realidade, é nessa pasta que estarão os fontes oficiais do seu projeto.
-
-#### [ /test ]
-
-Na pasta TEST temos todas as implementações dos testes com sintaxe para uso do **PROBAT**.
+**https://totvs.github.io/totvstec-doc/docs/tlpp/probat/**
