@@ -1,0 +1,45 @@
+{
+  "$comment": "Menu PROBAT — exemplos auto-descobertos de docs/exemplos/.",
+  "docPrefix": "tlpp/probat",
+  "exemplos": {
+    "label": "Exemplos PROBAT",
+    "key": "probat-exemplos-repo",
+    "mountSubpath": "exemplos-repositorio"
+  },
+  "items": [
+    {"type": "doc", "id": "index", "label": "Visão geral", "key": "probat-intro"},
+    {
+      "type": "category",
+      "label": "Fundamentos",
+      "collapsed": true,
+      "key": "probat-fundamentos",
+      "items": [
+        "configuracao",
+        "annotations",
+        "testes-funcao-classe",
+        "asserts"
+      ]
+    },
+    {
+      "type": "category",
+      "label": "Controle de execução",
+      "collapsed": true,
+      "key": "probat-execucao",
+      "items": [
+        "pulando-testes",
+        "error-log",
+        "suites-execucao",
+        "cobertura",
+        "execucao-resultados"
+      ]
+    },
+    {
+      "type": "category",
+      "label": "Cenários práticos",
+      "collapsed": true,
+      "key": "probat-cenarios",
+      "items": ["testes-api-rest", "integracao-bd", "tdd"]
+    },
+    {"type": "doc", "id": "automacao-scripts", "label": "Automação (CI/CD)", "key": "probat-automacao"}
+  ]
+}

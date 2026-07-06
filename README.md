@@ -1,24 +1,24 @@
 # tlpp-probat-samples
 
-Exemplos de uso da engine de testes **PROBAT** do tlppCore — asserts, suites, cobertura, testes de API REST, integração com banco e automação.
+Exemplos da engine de testes **PROBAT** do tlppCore.
 
-Os fontes em `src/` simulam o código da aplicação; os testes em `test/` usam a sintaxe PROBAT.
-
-## Estrutura do repositório
+## Estrutura
 
 | Pasta | Conteúdo |
 |-------|----------|
-| `src/` | Código de exemplo a ser testado (TLPP, AdvPL, API, TDD) |
-| `test/probat_resources/` | Asserts, skip, error log e recursos básicos |
-| `test/apartness/` | Execução apartada — suite, thread, prioridade |
-| `test/api/` | Testes de API REST |
-| `test/integration/` | Integração com banco de dados |
-| `test/unit/`, `test/tdd/`, `test/coverage/` | Unitários, TDD e cobertura |
-| `run/` | Scripts para executar o PROBAT de forma automatizada |
-| `ini/` | Configurações do AppServer para os exemplos |
+| `src/` | Código de exemplo a ser testado |
+| `test/` | Testes PROBAT |
+| `docs/conceito/` | Documentação narrativa |
+| `docs/exemplos/` | Catálogo GitHub (`npm run docs:exemplos`) |
+| `docs/sidebar.json` | Menu deste módulo |
+| `run/`, `ini/` | Automação e configuração AppServer |
 
-## Documentação
+## Scripts
 
-Conceitos, trilha de leitura e mapa dos exemplos:
+```bash
+npm run docs:exemplos
+```
+
+## Documentação publicada
 
 **https://totvs.github.io/totvstec-doc/docs/tlpp/probat/**
